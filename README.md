@@ -2,7 +2,7 @@
 
 > 团队Logo
 > 
-<img src="logo.jpg" alt="" width="400" height="400">
+<img src="lologo.jpg" alt="" width="400" height="400">
 
 "哈气后的TA，随风飞行，也许能到达更远的地方。"
 
