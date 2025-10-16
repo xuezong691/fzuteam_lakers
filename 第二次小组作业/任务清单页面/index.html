@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI任务助理</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+    <!-- 不需要ai聊天窗口，这段保留注释即可 -->
+    <!-- <div class="chat-container">
+        <div class="chat-header">💬 AI任务助理</div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai">你好！我是你的任务助理，可以帮你整理和管理待办事项。请告诉我你的任务吧！</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="输入你的任务或问题..." />
+            <button onclick="sendMessage()">发送</button>
+        </div>
+    </div> -->
+
+    <div class="tasks-container">
+        <div class="tasks-header">📋 待办任务</div>
+        <div class="tasks-list" id="tasksList"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./js/script.js"></script>
+</body>
+
+</html>
