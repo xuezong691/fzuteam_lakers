@@ -1,0 +1,2 @@
+直接运行back_end和my_mcp
+不过my_mcp需要有本地ollama并且配置运行qwen3：0.6b
