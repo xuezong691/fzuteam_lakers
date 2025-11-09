@@ -1,0 +1,207 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 450px;
+}
+
+.form-wrapper {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    min-height: 550px;
+}
+
+.form-container {
+    padding: 50px 40px;
+    position: absolute;
+    width: 100%;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    opacity: 0;
+    transform: translateX(-100%);
+    pointer-events: none;
+}
+
+.form-container.active {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: all;
+}
+
+.form-container.slide-out-left {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.form-container.slide-out-right {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.form-container h2 {
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+.switch-text {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    font-size: 14px;
+}
+
+.switch-link {
+    color: #667eea;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.switch-link:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* 欢迎页面样式 */
+.welcome-container {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 50px 40px;
+}
+
+.welcome-card {
+    text-align: center;
+}
+
+.welcome-card h2 {
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 28px;
+}
+
+.user-info {
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+.user-info p {
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #555;
+}
+
+.user-info p:last-child {
+    margin-bottom: 0;
+}
+
+.user-info strong {
+    color: #333;
+    margin-right: 10px;
+}
+
+.user-info span {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.btn-logout {
+    padding: 12px 40px;
+    background: #ff6b6b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-logout:hover {
+    background: #ee5a52;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+}
+
+/* 响应式设计 */
+@media (max-width: 500px) {
+    .form-container {
+        padding: 40px 30px;
+    }
+
+    .welcome-container {
+        padding: 40px 30px;
+    }
+}

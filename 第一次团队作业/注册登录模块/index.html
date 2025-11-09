@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册/登录</title>
+    <link rel="stylesheet" href="style/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-wrapper">
+            <!-- 登录表单 -->
+            <div class="form-container login-form active">
+                <h2>用户登录</h2>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="login-username">账号</label>
+                        <input type="text" id="login-username" name="username" placeholder="8位数字或英文字符" required
+                            maxlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" name="password" placeholder="8位数字或英文字符" required
+                            maxlength="8">
+                    </div>
+                    <button type="submit" class="btn-submit">登录</button>
+                    <p class="switch-text">
+                        还没有账号？ <span class="switch-link" onclick="switchToRegister()">立即注册</span>
+                    </p>
+                </form>
+            </div>
+
+            <!-- 注册表单 -->
+            <div class="form-container register-form">
+                <h2>用户注册</h2>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="register-username">账号</label>
+                        <input type="text" id="register-username" name="username" placeholder="8位数字或英文字符" required
+                            maxlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <input type="password" id="register-password" name="password" placeholder="8位数字或英文字符" required
+                            maxlength="8">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-teamname">团队名称</label>
+                        <input type="text" id="register-teamname" name="teamname" placeholder="请输入团队名称" required>
+                    </div>
+                    <button type="submit" class="btn-submit">注册</button>
+                    <p class="switch-text">
+                        已有账号？ <span class="switch-link" onclick="switchToLogin()">立即登录</span>
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- 登录后的欢迎页面 -->
+        <div class="welcome-container" id="welcomeContainer" style="display: none;">
+            <div class="welcome-card">
+                <h2>欢迎回来！</h2>
+                <div class="user-info">
+                    <p><strong>用户ID：</strong><span id="displayUserId"></span></p>
+                    <p><strong>团队名称：</strong><span id="displayTeamName"></span></p>
+                </div>
+                <button class="btn-logout" onclick="logout()">退出登录</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CDN 引入 -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/form-serialize@0.7.2/index.js"></script>
+    <script src="src/script.js"></script>
+</body>
+
+</html>
