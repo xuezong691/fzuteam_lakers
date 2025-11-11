@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>待办事项清单模块</title>
+    <link rel="stylesheet" href="todo-module.css">
+</head>
+
+<body>
+    <div class="todo-container">
+        <!-- 头部区域 -->
+        <div class="todo-header">
+            <h1>📋 待办事项清单</h1>
+            <button class="refresh-btn" onclick="refreshTasks()">
+                <span class="refresh-icon">🔄</span>
+                刷新
+            </button>
+        </div>
+
+        <!-- 任务列表区域 -->
+        <div class="tasks-list" id="tasksList">
+            <!-- 任务卡片将动态生成 -->
+        </div>
+
+        <!-- 空状态提示 -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-icon">📭</div>
+            <p>暂无待办事项</p>
+        </div>
+    </div>
+
+    <!-- 修改任务弹窗 -->
+    <div class="modal-overlay" id="modalOverlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ 修改待办事项</h2>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+
+            <div class="modal-body">
+                <form id="editForm">
+                    <input type="hidden" id="editTaskId">
+
+                    <div class="form-group">
+                        <label for="editTime">📅 时间</label>
+                        <input type="date" id="editTime" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editPlace">📍 地点</label>
+                        <input type="text" id="editPlace" placeholder="请输入地点" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editStaff">👤 负责人</label>
+                        <input type="text" id="editStaff" placeholder="请输入负责人" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editSomething">📝 事项内容</label>
+                        <textarea id="editSomething" rows="4" placeholder="请输入事项内容" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editUrgency">⚡ 紧急程度</label>
+                        <select id="editUrgency" required>
+                            <option value="0">已完成</option>
+                            <option value="1">普通</option>
+                            <option value="2">重要</option>
+                            <option value="3">紧急</option>
+                        </select>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="cancel-btn" onclick="closeModal()">取消</button>
+                        <button type="submit" class="confirm-btn">确定</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="todo-module.js"></script>
+</body>
+
+</html>
