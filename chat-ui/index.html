@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 聊天界面 - Dify 接口版</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div class="chat-page">
+    <div class="chat-container">
+      <div class="chat-messages" id="messagesContainer">
+        <div class="message-item ai">
+          <img src="https://picsum.photos/id/64/40/40" alt="AI 头像" class="avatar">
+          <div class="message-bubble">
+            <div class="message-content">你好！我是小办，已连接 Dify，本地智能助理随时待命～</div>
+            <div class="message-time">2025-11-05 15:00:00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-container" style="flex:1;">
+          <input type="text" id="inputContent" class="input" placeholder="输入你的问题..." />
+          <span class="topline"></span>
+          <span class="underline"></span>
+          <label class="label">请输入内容</label>
+        </div>
+        <button id="sendBtn" class="send-btn">发送</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messagesContainer = document.getElementById('messagesContainer');
+    const inputContent = document.getElementById('inputContent');
+    const sendBtn = document.getElementById('sendBtn');
+    let isLoading = false;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const welcomeTime = document.querySelector('.message-item.ai .message-time');
+      if (welcomeTime) welcomeTime.textContent = getFormattedTime();
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+    inputContent.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !isLoading) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    async function sendMessage() {
+      const content = inputContent.value.trim();
+      if (!content || isLoading) return;
+
+      messagesContainer.insertAdjacentHTML('beforeend', createMessageElement('user', content, getFormattedTime()));
+      inputContent.value = '';
+      scrollToBottom();
+
+      isLoading = true;
+      sendBtn.disabled = true;
+      sendBtn.textContent = '发送中...';
+
+      const loadingHtml = `
+        <div class="message-item ai loading-item">
+          <img src="https://picsum.photos/id/64/40/40" class="avatar">
+          <div class="message-bubble">
+            <div class="loading-spinner"></div>
+            <div class="message-content">AI 正在思考...</div>
+          </div>
+        </div>`;
+      messagesContainer.insertAdjacentHTML('beforeend', loadingHtml);
+      scrollToBottom();
+
+      try {
+        const aiReply = await getAIResponse(content);
+        removeLoadingElement();
+        messagesContainer.insertAdjacentHTML('beforeend', createMessageElement('ai', aiReply, getFormattedTime()));
+      } catch (error) {
+        removeLoadingElement();
+        messagesContainer.insertAdjacentHTML('beforeend', createMessageElement('ai', '抱歉，Dify API 调用失败，请检查服务是否运行。', getFormattedTime()));
+        console.error('Dify API 错误:', error);
+      } finally {
+        isLoading = false;
+        sendBtn.disabled = false;
+        sendBtn.textContent = '发送';
+        scrollToBottom();
+      }
+    }
+
+    // ========== 调用本地 Dify 接口 ==========
+    async function getAIResponse(userInput) {
+      const DIFY_API_URL = "http://127.0.0.1:5001/v1/chat-messages"; // 改为你的 Dify 服务地址
+      const DIFY_API_KEY = "app-你的应用API密钥"; // 替换成你自己的 Dify 应用密钥
+
+      const payload = {
+        inputs: {},
+        query: userInput,
+        response_mode: "blocking",
+        conversation_id: null
+      };
+
+      const response = await fetch(DIFY_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${DIFY_API_KEY}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`HTTP 错误：${response.status} - ${result.message || "请求失败"}`);
+      }
+
+      return result.answer || "（未获取到 AI 回复）";
+    }
+
+    function createMessageElement(sender, content, time) {
+      const avatarUrl = sender === 'user'
+        ? 'https://picsum.photos/id/237/40/40'
+        : 'https://picsum.photos/id/64/40/40';
+      const formatted = content.replace(/\n/g, '<br>');
+      return `
+        <div class="message-item ${sender}">
+          <img src="${avatarUrl}" class="avatar" />
+          <div class="message-bubble">
+            <div class="message-content">${formatted}</div>
+            <div class="message-time">${time}</div>
+          </div>
+        </div>`;
+    }
+
+    function getFormattedTime() {
+      return new Date().toLocaleTimeString("zh-CN", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      });
+    }
+
+    function scrollToBottom() {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function removeLoadingElement() {
+      const el = document.querySelector(".loading-item");
+      if (el) el.remove();
+    }
+  </script>
+</body>
+</html>
