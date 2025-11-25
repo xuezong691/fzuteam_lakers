@@ -120,7 +120,7 @@ def meeting(action):
     except Exception as e:
         return standard_response(False, message=f'会议处理错误: {str(e)}')
 
-# ==================== 任务管理模块 ====================还需要一个函数上传数据库的任务信息给前端
+# ==================== 任务管理模块 ====================
 def get_user_id_from_json(data):
     """
     从前端 JSON 里兼容读取 user_id：
@@ -259,7 +259,7 @@ def delete_task():
     except Exception as e:
         return standard_response(False, message=f'任务删除错误: {str(e)}')
 
-# ==================== 团队管理模块 ====================还需要一个函数上传数据库的成员信息给前端
+# ==================== 团队管理模块 ====================
 @app.route('/api/member/<action>', methods=['POST', 'DELETE'])
 def member_manage(action):
     try:
@@ -307,6 +307,54 @@ def member_manage(action):
         
     except Exception as e:
         return standard_response(False, message=f'团队管理错误: {str(e)}')
+
+@app.route('/api/member/refresh', methods=['GET'])
+def member_refresh():
+    try:
+        # 获取请求参数（GET 方法从 args 取值，若前端习惯用 JSON 可改为 request.json）
+        user_id = request.args.get('user_id')
+        
+        # 校验必填参数
+        if not user_id:
+            return standard_response(False, message='缺少用户ID')
+        
+        # 数据库连接逻辑（遵循规定的交互逻辑）
+        conn = get_db_connection('my_database')
+        if not conn:
+            return standard_response(False, message='数据库连接失败')
+
+        cursor = conn.cursor(dictionary=True)  # 以字典形式返回结果，方便前端处理
+        cursor.execute(
+            """
+            SELECT id, name, tech_stack 
+            FROM member 
+            WHERE user_id = %s  -- 假设 member 表有 user_id 字段关联用户
+            ORDER BY id DESC  -- 按ID倒序，最新的成员在前
+            """,
+            (user_id,)  # 元组格式传参，避免 SQL 注入
+        )
+        
+        # 获取所有成员数据
+        members = cursor.fetchall()
+        
+        # 处理 tech_stack 字段（如果存储的是 JSON 字符串，转为 Python 列表）
+        for member in members:
+            try:
+                member['tech_stack'] = json.loads(member['tech_stack']) if member['tech_stack'] else []
+            except json.JSONDecodeError:
+                member['tech_stack'] = []
+        
+        # 关闭数据库连接
+        cursor.close()
+        conn.close()
+
+        # 返回成功响应，携带成员列表数据
+        return standard_response(True, data={'members': members})
+        
+    except Exception as e:
+        return standard_response(False, message=f'刷新成员列表错误: {str(e)}')
+
+# ==================== 智能任务匹配模块 ====================
 
 # ==================== AI功能模块 ====================需要接上my_dify_api
 @app.route('/api/ai/<action>', methods=['POST'])
