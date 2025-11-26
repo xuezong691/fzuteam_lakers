@@ -1,0 +1,19 @@
+1111
+更改主页面page.html
+要求是css可以单放在static文件夹，然后在style上方引入(参考todotask的引入格式)，js代码必须添加在page的js段中，原本的js段不要更改，html主体放在相应的右侧内容区就可以了
+
+1111
+会议的接口api
+@app.route('/api/meeting/<action>', methods=['POST'])
+action = 'audio-to-text'或'generate-summary'
+
+1111
+任务分解的接口api
+@app.route('/api/ai/<action>', methods=['POST'])
+action = 'generate-tasks'
+
+1111
+聊天的接口api
+@app.route('/api/ai/<action>', methods=['POST'])
+action = 'chat'
+
