@@ -72,6 +72,7 @@ class DifyAPIClient:
 
 
         try:
+            # print(data)
             response = requests.post(
                 chat_url,
                 headers=self.headers,
@@ -221,9 +222,56 @@ def call_for_task_generate(QUERY,PARAGRAPH):
         return None
 
 
+def call_for_chat(QUERY,PARAGRAPH):
+
+    # ========== 配置区域 ==========
+    API_KEY = "app-7Sqz3aoSXwjp8AOCysUC3CQm"  # 你的API密钥
+    BASE_URL = "http://127.0.0.1:80"  # Dify服务地址，根据你自己的地址和端口进行调整
+    FILE_PATH = ""  # 文件路径
+    # QUERY = "生成分解后的任务json列表"
+    # PARAGRAPH = "我们小组有6个人，要求是对马原第三章进行扩展ppt汇报"
+
+    # 是否使用文件
+    USE_FILE = False  # True: 上传文件, False: 不使用文件
+    TIMEOUT = 300  # 超时时间（秒）
+    # ==============================
+
+    # 创建客户端
+    client = DifyAPIClient(API_KEY, BASE_URL)
+
+    # 上传文件（如果需要）
+    file_id = None
+    if USE_FILE and FILE_PATH:
+        if not os.path.exists(FILE_PATH):
+            print(f"❌ 文件不存在: {FILE_PATH}")
+            return
+
+        print(f"📤 上传文件: {FILE_PATH}")
+        file_id = client.upload_file(FILE_PATH)
+        if file_id is None:
+            return
+
+    # 执行工作流
+    print(f"🚀 执行工作流...")
+    result = client.send_chat_message(
+        query=QUERY,
+        paragraph_text=PARAGRAPH,
+        timeout=TIMEOUT
+    )
+
+    # 输出结果
+    if result:
+        return result
+
+    else:
+        print("❌ 执行失败")
+        return None
+
+
 if __name__ == "__main__":
-    # call_for_greeting_summarize("总结","./test_file/video.mp3")
+    # print(call_for_greeting_summarize("总结","./test_file/video.mp3"))
     # call_for_greeting_translate("总结","./test_file/video.mp3")
-    call_for_task_generate("生成分解后的任务json列表", "我们小组有6个人，要求是对马原第三章进行扩展ppt汇报")
+    # call_for_task_generate("生成分解后的任务json列表", "我们小组有6个人，要求是对马原第三章进行扩展ppt汇报")
+    print(call_for_chat("快速回答","你好"))
 
     #app-yCDYXJ7bZw57zVFGiHMfky9G

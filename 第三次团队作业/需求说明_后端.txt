@@ -76,4 +76,7 @@ call_for_task_generate("生成分解后的任务json列表", "我们小组有6�
 
 call_for_greeting_summarize("总结","./test_file/video.mp3")
 call_for_greeting_translate("语音转文字","./test_file/video.mp3")
-这两个是生成摘要和语言转文字，第一个参数固定即可，第二个参数是音频文件位置，返回值就是一段文本
+call_for_chat("快速回答","你好")
+
+前两个分别是生成摘要，语言转文字，第一个参数固定即可，第二个参数是音频文件位置，返回值就是一段文本
+第三个是聊天函数，第一个参数固定，第二个参数用户问题输入
