@@ -201,13 +201,78 @@
     </div>
 
     <!-- 智能任务分解 -->
-    <div class="page" id="page-task_generater">
-      <h2>🧩 智能任务分解</h2>
-      <div class="page-content">
-        <p>配置系统参数、权限管理、通知设置等。</p>
-        <label><input type="checkbox"> 启用邮件通知</label>
+<div class="page" id="page-task_generater">
+  <h2>🧩 智能任务分解</h2>
+  <div class="page-content">
+    <div class="task-generator-wrapper">
+      <!-- 任务输入区域 -->
+      <div class="input-section">
+        <div class="task-form-field full">
+          <label for="taskInput">输入需要分解的任务或目标：</label>
+          <textarea
+            id="taskInput"
+            name="taskInput"
+            rows="4"
+            placeholder="例如：开发一个在线购物网站、组织一次团队建设活动、完成季度销售目标..."
+            required
+          ></textarea>
+        </div>
+        
+        <div class="task-form-row">
+          <div class="task-form-field">
+            <label for="taskComplexity">任务复杂度</label>
+            <select id="taskComplexity" name="complexity">
+              <option value="simple">简单</option>
+              <option value="medium" selected>中等</option>
+              <option value="complex">复杂</option>
+            </select>
+          </div>
+          <div class="task-form-field">
+            <label for="taskDeadline">期望完成时间（天）</label>
+            <input
+              type="number"
+              id="taskDeadline"
+              name="deadline"
+              min="1"
+              max="365"
+              value="7"
+              placeholder="例如：7"
+            />
+          </div>
+        </div>
+        
+        <div class="task-form-actions">
+          <button type="button" id="btnGenerateTasks" class="btn-primary">
+            🧩 智能分解任务
+          </button>
+        </div>
+      </div>
+
+      <!-- 加载状态 -->
+      <div id="loadingSection" class="loading-section" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>AI正在分析并分解您的任务...</p>
+      </div>
+
+      <!-- 结果展示区域 -->
+      <div id="resultSection" class="result-section" style="display: none;">
+        <h3>📋 分解后的子任务</h3>
+        <div id="generatedTasks" class="generated-tasks">
+          <!-- 生成的子任务将在这里显示 -->
+        </div>
+        
+        <div class="result-actions">
+          <button type="button" id="btnSaveTasks" class="btn-primary">
+            💾 保存到事项看板
+          </button>
+          <button type="button" id="btnRegenerate" class="btn-secondary">
+            🔄 重新生成
+          </button>
+        </div>
       </div>
     </div>
+  </div>
+</div>
 
     <!-- 事项看板 -->
     <div class="page" id="page-todotask">
@@ -522,6 +587,103 @@
         });
       }
     }
+
+// ========== 智能任务分解功能 ==========
+async function generateTasks() {
+    const taskInput = document.getElementById('taskInput');
+    const complexitySelect = document.getElementById('taskComplexity');
+    const deadlineInput = document.getElementById('taskDeadline');
+    
+    const taskDescription = taskInput.value.trim();
+    if (!taskDescription) {
+        alert('请输入需要分解的任务描述');
+        return;
+    }
+
+    // 显示加载状态
+    document.getElementById('loadingSection').style.display = 'block';
+    document.getElementById('resultSection').style.display = 'none';
+
+    try {
+        const response = await fetch('/api/ai/generate-tasks', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                task: taskDescription,
+                complexity: complexitySelect.value,
+                deadline: parseInt(deadlineInput.value)
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('网络请求失败');
+        }
+
+        const result = await response.json();
+        
+        // 隐藏加载状态
+        document.getElementById('loadingSection').style.display = 'none';
+        
+        if (result.success) {
+            // 显示结果
+            displayGeneratedTasks(result.tasks || []);
+            document.getElementById('resultSection').style.display = 'block';
+        } else {
+            alert(result.message || '任务分解失败');
+        }
+    } catch (error) {
+        console.error('任务分解错误:', error);
+        document.getElementById('loadingSection').style.display = 'none';
+        alert('任务分解失败: ' + error.message);
+    }
+}
+
+function displayGeneratedTasks(tasks) {
+    const container = document.getElementById('generatedTasks');
+    container.innerHTML = '';
+
+    tasks.forEach((task, index) => {
+        const taskElement = document.createElement('div');
+        taskElement.className = 'generated-task-item';
+        taskElement.innerHTML = `
+            <h4>子任务 ${index + 1}: ${task.title || '未命名任务'}</h4>
+            <p>${task.description || '暂无描述'}</p>
+            ${task.estimated_time ? `<p><small>预计耗时: ${task.estimated_time}</small></p>` : ''}
+        `;
+        container.appendChild(taskElement);
+    });
+}
+
+// 初始化任务分解模块事件
+function initTaskGeneratorEvents() {
+    const generateBtn = document.getElementById('btnGenerateTasks');
+    const saveBtn = document.getElementById('btnSaveTasks');
+    const regenerateBtn = document.getElementById('btnRegenerate');
+
+    if (generateBtn) {
+        generateBtn.addEventListener('click', generateTasks);
+    }
+    
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+            alert('保存功能待实现 - 这里可以调用任务添加接口');
+        });
+    }
+    
+    if (regenerateBtn) {
+        regenerateBtn.addEventListener('click', generateTasks);
+    }
+}
+
+// 在DOM加载完成后初始化
+window.addEventListener('DOMContentLoaded', function() {
+    // ... 现有代码 ...
+    
+    // 新增：初始化任务分解事件
+    initTaskGeneratorEvents();
+});
 
     // ========== 左侧导航：页面切换逻辑 ==========
     document.querySelectorAll(".nav-links li").forEach(function (item) {

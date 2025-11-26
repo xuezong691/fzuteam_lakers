@@ -201,3 +201,78 @@
     padding: 12px;
   }
 }
+
+/* 智能任务分解样式 */
+.task-generator-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.input-section {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
+
+.loading-section {
+  text-align: center;
+  padding: 40px 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.result-section {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.generated-tasks {
+  margin: 20px 0;
+}
+
+.generated-task-item {
+  background: #f8f9fa;
+  border-left: 4px solid #3498db;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.generated-task-item h4 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.generated-task-item p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 13px;
+}
+
+.result-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-start;
+  margin-top: 20px;
+}
