@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>系统主界面</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='todotask.css') }}">
+  <!-- 引入会议模块专属CSS（放在static文件夹） -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='meeting.css') }}">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+    body {
+      display: flex;
+      min-height: 100vh;
+      background-color: #f8f9fa;
+    }
+    /* ========== 左侧边栏 ========== */
+    .sidebar {
+      width: 240px;
+      background: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .logo-container {
+      padding: 20px;
+      border-bottom: 1px solid #34495e;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3498db;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo img {
+      width: 36px;
+      height: 36px;
+      background: #3498db;
+      border-radius: 6px;
+    }
+    .nav-links {
+      padding: 20px 0;
+      list-style: none;
+    }
+    .nav-links li {
+      padding: 12px 24px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .nav-links li:hover,
+    .nav-links li.active {
+      background: #34495e;
+      color: #3498db;
+    }
+    .nav-links li i {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+    /* ========== 主内容区 ========== */
+    .main-content {
+      flex: 1;
+      margin-left: 240px;
+      padding: 30px;
+      background: #ffffff;
+    }
+    .page {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    .page.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    .page-content {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      min-height: 500px;
+    }
+    /* 响应式：小屏隐藏侧边栏（可选） */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+      }
+      .sidebar .logo span,
+      .sidebar .nav-links li span {
+        display: none;
+      }
+      .main-content {
+        margin-left: 70px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 左侧导航栏 -->
+  <div class="sidebar">
+    <div class="logo-container">
+      <div class="logo">
+        <span>你好！小办同学</span>
+      </div>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li data-page="dashboard" class="active">
+        <span>💡</span>
+        <span>AI助手</span>
+      </li>
+      <li data-page="data">
+        <span>🧑‍💼</span>
+        <span>成员数据</span>
+      </li>
+      <li data-page="meeting">
+        <span>📄</span>
+        <span>会议助手</span>
+      </li>
+      <li data-page="task_generater">
+        <span>🧩</span>
+        <span>智能任务分解</span>
+      </li>
+      <li data-page="todotask">
+        <span>📍</span>
+        <span>事项看板</span>
+      </li>
+    </ul>
+  </div>
+  <!-- 右侧内容区 -->
+  <div class="main-content">
+    <!-- AI聊天 -->
+    <div class="page active" id="page-dashboard">
+      <h2>💡 来和大模型聊天</h2>
+      <div class="page-content">
+        <p>欢迎使用系统！这里是主控制面板。</p>
+        <p>你可以查看系统状态、任务进度等关键信息。</p>
+      </div>
+    </div>
+    <!-- 团队成员 -->
+    <div class="page" id="page-data">
+      <h2>🧑‍💼 团队成员数据</h2>
+      <div class="page-content">
+        <p>在此模块进行数据导入、清洗与可视化分析。</p>
+        <button style="margin-top: 10px;">上传数据文件</button>
+      </div>
+    </div>
+    <!-- 会议助手（新增完整前端实现） -->
+    <div class="page" id="page-meeting">
+      <h2>📄 会议语言转文字、语言一键生成摘要</h2>
+      <div class="page-content">
+        <div class="meeting-wrapper">
+          <!-- 顶部操作区 -->
+          <div class="meeting-header">
+            <div>
+              <h3>会议智能处理中心</h3>
+              <p class="meeting-subtitle">支持音频转文字、会议摘要生成，快速导出报告</p>
+            </div>
+            <div class="meeting-actions">
+              <button type="button" id="btnClearMeeting" class="btn-secondary">
+                清空内容
+              </button>
+            </div>
+          </div>
+
+          <!-- 功能选项卡 -->
+          <div class="meeting-tabs">
+            <button class="meeting-tab active" data-tab="audio-to-text">音频转文字</button>
+            <button class="meeting-tab" data-tab="generate-summary">生成会议摘要</button>
+          </div>
+
+          <!-- 音频转文字面板 -->
+          <div class="meeting-panel active" id="panel-audio-to-text">
+            <div class="meeting-form">
+              <div class="meeting-form-field">
+                <label for="meetingAudio">上传会议音频文件</label>
+                <input type="file" id="meetingAudio" accept="audio/*" />
+                <p class="form-hint">支持格式：mp3、wav、m4a，单个文件不超过200MB</p>
+              </div>
+              <div class="meeting-form-field full">
+                <label for="audioLanguage">音频语言</label>
+                <select id="audioLanguage" name="language">
+                  <option value="zh-CN">中文（普通话）</option>
+                  <option value="en-US">英文（美式）</option>
+                  <option value="ja-JP">日语</option>
+                  <option value="ko-KR">韩语</option>
+                </select>
+              </div>
+              <div class="meeting-form-actions">
+                <button type="button" id="btnAudioToText" class="btn-primary">
+                  开始转写
+                </button>
+              </div>
+            </div>
+
+            <!-- 转写结果展示 -->
+            <div class="meeting-result">
+              <h4>转写结果</h4>
+              <div class="result-container">
+                <textarea id="transcriptBox" rows="10" placeholder="转写结果将显示在这里..." readonly></textarea>
+              </div>
+              <div class="result-actions">
+                <button type="button" id="btnCopyTranscript" class="btn-secondary">
+                  复制文本
+                </button>
+                <button type="button" id="btnDownloadTranscript" class="btn-secondary">
+                  下载文本
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 生成会议摘要面板 -->
+          <div class="meeting-panel" id="panel-generate-summary">
+            <div class="meeting-form">
+              <div class="meeting-form-field full">
+                <label for="summarySource">输入会议文本（或粘贴转写结果）</label>
+                <textarea id="summarySource" rows="8" placeholder="请输入会议原始文本..."></textarea>
+              </div>
+              <div class="meeting-form-row">
+                <div class="meeting-form-field">
+                  <label for="summaryType">报告类型</label>
+                  <select id="summaryType" name="summaryType">
+                    <option value="周报">周报</option>
+                    <option value="月报">月报</option>
+                    <option value="自定义">自定义</option>
+                  </select>
+                </div>
+                <div class="meeting-form-field">
+                  <label for="summaryLength">摘要长度</label>
+                  <select id="summaryLength" name="summaryLength">
+                    <option value="short">简短（100字内）</option>
+                    <option value="medium" selected>中等（300字左右）</option>
+                    <option value="detailed">详细（500字以上）</option>
+                  </select>
+                </div>
+              </div>
+              <div class="meeting-form-actions">
+                <button type="button" id="btnGenerateSummary" class="btn-primary">
+                  生成摘要
+                </button>
+              </div>
+            </div>
+
+            <!-- 摘要结果展示 -->
+            <div class="meeting-result">
+              <h4>会议摘要</h4>
+              <div class="result-container">
+                <textarea id="summaryBox" rows="10" placeholder="会议摘要将显示在这里..." readonly></textarea>
+              </div>
+              <div class="result-actions">
+                <button type="button" id="btnCopySummary" class="btn-secondary">
+                  复制摘要
+                </button>
+                <button type="button" id="btnDownloadSummary" class="btn-secondary">
+                  下载报告
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 智能任务分解 -->
+    <div class="page" id="page-task_generater">
+      <h2>🧩 智能任务分解</h2>
+      <div class="page-content">
+        <p>配置系统参数、权限管理、通知设置等。</p>
+        <label><input type="checkbox"> 启用邮件通知</label>
+      </div>
+    </div>
+    <!-- 事项看板 -->
+    <div class="page" id="page-todotask">
+      <h2>📍 事项看板</h2>
+      <div class="page-content">
+        <div class="todo-wrapper">
+          <!-- 顶部：标题 + 刷新按钮 -->
+          <div class="todo-header">
+            <div>
+              <h3>团队待办事项</h3>
+              <p class="todo-subtitle">根据当前登录用户加载任务</p>
+            </div>
+            <div class="todo-actions">
+              <button type="button" id="btnRefreshTasks" class="btn-secondary">
+                刷新任务
+              </button>
+            </div>
+          </div>
+          <!-- 添加任务表单 -->
+          <form id="taskForm" class="task-form">
+            <div class="task-form-row">
+              <div class="task-form-field">
+                <label for="taskTime">日期</label>
+                <input type="date" id="taskTime" name="time" required />
+              </div>
+              <div class="task-form-field">
+                <label for="taskPlace">地点</label>
+                <input
+                  type="text"
+                  id="taskPlace"
+                  name="place"
+                  placeholder="例如：实验室A"
+                />
+              </div>
+            </div>
+            <div class="task-form-row">
+              <div class="task-form-field">
+                <label for="taskStaff">负责人</label>
+                <input
+                  type="text"
+                  id="taskStaff"
+                  name="staff"
+                  placeholder="例如：张三"
+                />
+              </div>
+              <div class="task-form-field">
+                <label for="taskUrgency">紧急程度</label>
+                <select id="taskUrgency" name="urgency">
+                  <option value="1">一般</option>
+                  <option value="2">重要</option>
+                  <option value="3">紧急</option>
+                </select>
+              </div>
+            </div>
+            <div class="task-form-row">
+              <div class="task-form-field full">
+                <label for="taskSomething">任务内容</label>
+                <textarea
+                  id="taskSomething"
+                  name="something"
+                  rows="2"
+                  placeholder="需要完成的事项..."
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <div class="task-form-actions">
+              <button type="submit" class="btn-primary">
+                添加任务
+              </button>
+            </div>
+          </form>
+          <!-- 任务卡片容器 -->
+          <div id="taskBoard" class="task-board">
+            <p class="task-empty">
+              目前还没有任务，点击上方“刷新任务”从后端加载数据，或者先添加一条任务。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // 获取当前登录用户的 userId（登录时写入 localStorage）
+    function getCurrentUserId() {
+      return localStorage.getItem("userId");
+    }
+    // 渲染任务列表为卡片
+    function renderTasks(tasks) {
+      var board = document.getElementById("taskBoard");
+      if (!board) return;
+      board.innerHTML = "";
+      if (!tasks || tasks.length === 0) {
+        var empty = document.createElement("p");
+        empty.className = "task-empty";
+        empty.textContent = "没有任务，试试添加一条或点击“刷新任务”。";
+        board.appendChild(empty);
+        return;
+      }
+      tasks.forEach(function (task) {
+        var card = document.createElement("div");
+        card.className = "task-card";
+        var title = document.createElement("div");
+        title.className = "task-title";
+        title.textContent = task.something || "未填写任务内容";
+        var meta = document.createElement("div");
+        meta.className = "task-meta";
+        var timeSpan = document.createElement("span");
+        timeSpan.textContent = "日期：" + (task.time || "-");
+        var placeSpan = document.createElement("span");
+        placeSpan.textContent = "地点：" + (task.place || "-");
+        var staffSpan = document.createElement("span");
+        staffSpan.textContent = "负责人：" + (task.staff || "-");
+        meta.appendChild(timeSpan);
+        meta.appendChild(placeSpan);
+        meta.appendChild(staffSpan);
+        var content = document.createElement("div");
+        content.className = "task-content";
+        content.textContent = task.something || "";
+        var footer = document.createElement("div");
+        footer.className = "task-footer";
+        var urgencySpan = document.createElement("span");
+        urgencySpan.className = "task-urgency";
+        urgencySpan.textContent = "紧急程度：" + (task.urgency || 1);
+        var deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "task-delete-btn";
+        deleteBtn.textContent = "删除";
+        deleteBtn.setAttribute("data-id", task.id);
+        footer.appendChild(urgencySpan);
+        footer.appendChild(deleteBtn);
+        card.appendChild(title);
+        card.appendChild(meta);
+        // card.appendChild(content);
+        card.appendChild(footer);
+        board.appendChild(card);
+      });
+    }
+    // 调用 /api/task/refresh 获取任务列表
+    async function refreshTasks() {
+      var userId = getCurrentUserId();
+      if (!userId) {
+        alert("未找到用户ID，请重新登录后再试。");
+        return;
+      }
+      try {
+        var response = await fetch("/api/task/refresh", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            user_id: parseInt(userId, 10)
+          })
+        });
+        if (!response.ok) {
+          throw new Error("网络错误，状态码：" + response.status);
+        }
+        var result = await response.json();
+        if (result.success) {
+          renderTasks(result.tasks  || []);
+        } else {
+          alert(result.message || "刷新任务失败");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("刷新任务失败：" + err.message);
+      }
+    }
+    // 调用 /api/task/add 添加任务
+    async function handleAddTask(event) {
+      event.preventDefault();
+      var userId = getCurrentUserId();
+      if (!userId) {
+        alert("未找到用户ID，请重新登录后再试。");
+        return;
+      }
+      var timeInput = document.getElementById("taskTime");
+      var placeInput = document.getElementById("taskPlace");
+      var staffInput = document.getElementById("taskStaff");
+      var urgencySelect = document.getElementById("taskUrgency");
+      var somethingInput = document.getElementById("taskSomething");
+      var payload = {
+        user_id: parseInt(userId, 10),
+        time: timeInput.value,
+        place: placeInput.value,
+        staff: staffInput.value,
+        something: somethingInput.value,
+        urgency: parseInt(urgencySelect.value || "1", 10)
+      };
+      if (!payload.time || !payload.something) {
+        alert("日期和任务内容为必填项。");
+        return;
+      }
+      try {
+        var response = await fetch("/api/task/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+          throw new Error("网络错误，状态码：" + response.status);
+        }
+        var result = await response.json();
+        if (result.success) {
+          // 清空表单
+          placeInput.value = "";
+          staffInput.value = "";
+          somethingInput.value = "";
+          urgencySelect.value = "1";
+          // 重新刷新列表
+          await refreshTasks();
+        } else {
+          alert(result.message || "添加任务失败");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("添加任务失败：" + err.message);
+      }
+    }
+    // 调用 /api/task/delete 删除任务
+    async function deleteTaskById(id) {
+      if (!id) return;
+      if (!confirm("确认删除这条任务吗？")) return;
+      try {
+        var response = await fetch("/api/task/delete", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ id: id })
+        });
+        if (!response.ok) {
+          throw new Error("网络错误，状态码：" + response.status);
+        }
+        var result = await response.json();
+        if (result.success) {
+          await refreshTasks();
+        } else {
+          alert(result.message || "删除任务失败");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("删除任务失败：" + err.message);
+      }
+    }
+    // 事项看板内事件绑定（按钮、卡片删除）
+    function initTodoTaskEvents() {
+      var refreshBtn = document.getElementById("btnRefreshTasks");
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", function () {
+          refreshTasks();
+        });
+      }
+      var taskForm = document.getElementById("taskForm");
+      if (taskForm) {
+        taskForm.addEventListener("submit", handleAddTask);
+      }
+      var taskBoard = document.getElementById("taskBoard");
+      if (taskBoard) {
+        taskBoard.addEventListener("click", function (event) {
+          var target = event.target;
+          if (target.classList.contains("task-delete-btn")) {
+            var id = target.getAttribute("data-id");
+            deleteTaskById(id);
+          }
+        });
+      }
+    }
+    // ========== 左侧导航：页面切换逻辑 ==========
+    document.querySelectorAll(".nav-links li").forEach(function (item) {
+      item.addEventListener("click", function () {
+        var pageId = this.getAttribute("data-page");
+        // 移除所有 active
+        document
+          .querySelectorAll(".nav-links li")
+          .forEach(function (li) {
+            li.classList.remove("active");
+          });
+        document
+          .querySelectorAll(".page")
+          .forEach(function (p) {
+            p.classList.remove("active");
+          });
+        // 激活当前项
+        this.classList.add("active");
+        var pageElement = document.getElementById("page-" + pageId);
+        if (pageElement) {
+          pageElement.classList.add("active");
+        }
+        // 如果切换到事项看板，自动刷新一次
+        if (pageId === "todotask") {
+          refreshTasks();
+        }
+      });
+    });
+    // 退出登录
+    function logout() {
+      localStorage.removeItem("userId");
+      localStorage.removeItem("teamName");
+      window.location.href = "/"; // 跳回登录页
+    }
+    // 页面加载时恢复用户信息（用于“个人中心”）
+    window.addEventListener("DOMContentLoaded", function () {
+      var userId = localStorage.getItem("userId");
+      var teamName = localStorage.getItem("teamName");
+      // 如果你页面里真的有对应元素，可以解开下面的注释来显示
+      // var userIdSpan = document.getElementById("displayUserId");
+      // var teamNameSpan = document.getElementById("displayTeamName");
+      if (userId && teamName) {
+        // if (userIdSpan) userIdSpan.textContent = userId;
+        // if (teamNameSpan) teamNameSpan.textContent = teamName;
+      } else {
+        // 未登录则跳转回首页
+        window.location.href = "/";
+      }
+      // 初始化事项看板的事件（按钮、表单、卡片删除）
+      initTodoTaskEvents();
+      // 初始化会议助手事件
+      initMeetingEvents();
+    });
+
+    // ========== 会议助手新增JS代码（追加在原有JS段末尾） ==========
+    function initMeetingEvents() {
+      // 选项卡切换
+      document.querySelectorAll(".meeting-tab").forEach(tab => {
+        tab.addEventListener("click", function() {
+          const tabType = this.getAttribute("data-tab");
+          // 切换选项卡激活状态
+          document.querySelectorAll(".meeting-tab").forEach(t => t.classList.remove("active"));
+          this.classList.add("active");
+          // 切换面板显示
+          document.querySelectorAll(".meeting-panel").forEach(panel => {
+            panel.classList.remove("active");
+            if (panel.id === `panel-${tabType}`) {
+              panel.classList.add("active");
+            }
+          });
+        });
+      });
+
+      // 音频转文字
+      document.getElementById("btnAudioToText").addEventListener("click", async function() {
+        const audioFile = document.getElementById("meetingAudio").files[0];
+        const language = document.getElementById("audioLanguage").value;
+        const transcriptBox = document.getElementById("transcriptBox");
+
+        if (!audioFile) {
+          alert("请先上传会议音频文件");
+          return;
+        }
+
+        // 显示加载状态
+        this.textContent = "转写中...";
+        this.disabled = true;
+        transcriptBox.textContent = "正在处理音频，请稍候...";
+
+        try {
+          const formData = new FormData();
+          formData.append("audio", audioFile);
+          formData.append("language", language);
+          formData.append("user_id", getCurrentUserId());
+
+          const response = await fetch("/api/meeting/audio-to-text", {
+            method: "POST",
+            body: formData
+          });
+
+          if (!response.ok) {
+            throw new Error(`转写失败，状态码：${response.status}`);
+          }
+
+          const result = await response.json();
+          if (result.success) {
+            transcriptBox.textContent = result.transcript || "未识别到有效内容";
+            // 自动将转写结果复制到摘要输入框
+            document.getElementById("summarySource").value = result.transcript || "";
+          } else {
+            alert(`转写失败：${result.message || "未知错误"}`);
+            transcriptBox.textContent = "";
+          }
+        } catch (err) {
+          console.error("音频转文字错误：", err);
+          alert(`转写失败：${err.message}`);
+          transcriptBox.textContent = "";
+        } finally {
+          // 恢复按钮状态
+          this.textContent = "开始转写";
+          this.disabled = false;
+        }
+      });
+
+      // 生成会议摘要
+      document.getElementById("btnGenerateSummary").addEventListener("click", async function() {
+        const sourceText = document.getElementById("summarySource").value.trim();
+        const summaryType = document.getElementById("summaryType").value;
+        const summaryLength = document.getElementById("summaryLength").value;
+        const summaryBox = document.getElementById("summaryBox");
+
+        if (!sourceText) {
+          alert("请输入会议原始文本");
+          return;
+        }
+
+        // 显示加载状态
+        this.textContent = "生成中...";
+        this.disabled = true;
+        summaryBox.textContent = "正在生成摘要，请稍候...";
+
+        try {
+          const response = await fetch("/api/meeting/generate-summary", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              user_id: getCurrentUserId(),
+              source_text: sourceText,
+              summary_type: summaryType,
+              summary_length: summaryLength
+            })
+          });
+
+          if (!response.ok) {
+            throw new Error(`生成失败，状态码：${response.status}`);
+          }
+
+          const result = await response.json();
+          if (result.success) {
+            summaryBox.textContent = result.summary || "无法生成有效摘要";
+          } else {
+            alert(`生成失败：${result.message || "未知错误"}`);
+            summaryBox.textContent = "";
+          }
+        } catch (err) {
+          console.error("生成会议摘要错误：", err);
+          alert(`生成失败：${err.message}`);
+          summaryBox.textContent = "";
+        } finally {
+          // 恢复按钮状态
+          this.textContent = "生成摘要";
+          this.disabled = false;
+        }
+      });
+
+      // 复制转写结果
+      document.getElementById("btnCopyTranscript").addEventListener("click", function() {
+        const transcriptBox = document.getElementById("transcriptBox");
+        if (!transcriptBox.textContent) {
+          alert("没有可复制的内容");
+          return;
+        }
+        transcriptBox.select();
+        document.execCommand("copy");
+        alert("转写结果已复制到剪贴板");
+      });
+
+      // 复制摘要结果
+      document.getElementById("btnCopySummary").addEventListener("click", function() {
+        const summaryBox = document.getElementById("summaryBox");
+        if (!summaryBox.textContent) {
+          alert("没有可复制的内容");
+          return;
+        }
+        summaryBox.select();
+        document.execCommand("copy");
+        alert("会议摘要已复制到剪贴板");
+      });
+
+      // 下载转写文本
+      document.getElementById("btnDownloadTranscript").addEventListener("click", function() {
+        const transcript = document.getElementById("transcriptBox").textContent;
+        if (!transcript) {
+          alert("没有可下载的内容");
+          return;
+        }
+        downloadFile(transcript, "会议转写文本.txt", "text/plain");
+      });
+
+      // 下载摘要报告
+      document.getElementById("btnDownloadSummary").addEventListener("click", function() {
+        const summary = document.getElementById("summaryBox").textContent;
+        const summaryType = document.getElementById("summaryType").value;
+        if (!summary) {
+          alert("没有可下载的内容");
+          return;
+        }
+        const fileName = `${summaryType}-会议摘要.txt`;
+        downloadFile(summary, fileName, "text/plain");
+      });
+
+      // 清空会议内容
+      document.getElementById("btnClearMeeting").addEventListener("click", function() {
+        if (confirm("确认要清空所有会议相关内容吗？")) {
+          document.getElementById("meetingAudio").value = "";
+          document.getElementById("transcriptBox").textContent = "";
+          document.getElementById("summarySource").value = "";
+          document.getElementById("summaryBox").textContent = "";
+        }
+      });
+    }
+
+    // 通用文件下载函数
+    function downloadFile(content, fileName, contentType) {
+      const blob = new Blob([content], { type: contentType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 0);
+    }
+  </script>
+</body>
+</html>
