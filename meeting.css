@@ -1,0 +1,182 @@
+/* 会议助手整体样式 */
+.meeting-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* 顶部标题栏 */
+.meeting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+
+.meeting-header h3 {
+  font-size: 20px;
+  margin-bottom: 4px;
+  color: #2c3e50;
+}
+
+.meeting-subtitle {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+/* 功能选项卡 */
+.meeting-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #ced4da;
+  padding-bottom: 8px;
+}
+
+.meeting-tab {
+  background: #ecf0f1;
+  color: #2c3e50;
+  border: none;
+  outline: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.meeting-tab.active {
+  background: #3498db;
+  color: #ffffff;
+}
+
+.meeting-tab:hover:not(.active) {
+  background: #e2e6ea;
+}
+
+/* 面板容器 */
+.meeting-panel {
+  display: none;
+}
+
+.meeting-panel.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+/* 表单样式 */
+.meeting-form {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+}
+
+.meeting-form-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.meeting-form-field {
+  flex: 1;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+}
+
+.meeting-form-field.full {
+  flex-basis: 100%;
+}
+
+.meeting-form-field label {
+  font-size: 13px;
+  color: #495057;
+  margin-bottom: 4px;
+}
+
+.meeting-form-field input,
+.meeting-form-field select,
+.meeting-form-field textarea {
+  padding: 7px 9px;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  font-size: 14px;
+  outline: none;
+  background-color: #ffffff;
+}
+
+.meeting-form-field input:focus,
+.meeting-form-field select:focus,
+.meeting-form-field textarea:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.15);
+}
+
+.form-hint {
+  font-size: 12px;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+.meeting-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* 结果展示区 */
+.meeting-result {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.meeting-result h4 {
+  font-size: 15px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.result-container {
+  margin-bottom: 12px;
+}
+
+.result-container textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+  font-size: 14px;
+  resize: none;
+  background-color: #f8f9fa;
+}
+
+.result-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .meeting-form {
+    padding: 12px;
+  }
+
+  .meeting-form-row {
+    gap: 8px;
+  }
+
+  .meeting-tab {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .result-container textarea {
+    height: 80px;
+  }
+}
