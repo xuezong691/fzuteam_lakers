@@ -1,0 +1,413 @@
+/* ========== 基础样式 ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ========== 智能任务分解容器 ========== */
+.task-decomposition-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.task-decomposition-container h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.task-decomposition-container h3 {
+    color: #34495e;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.task-decomposition-container h4 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* ========== 输入区域样式 ========== */
+.task-decomposition-container .input-section,
+.task-decomposition-container .result-section {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+/* ========== 任务表单样式 ========== */
+.task-decomposition-container .task-form {
+    display: grid;
+    gap: 25px;
+}
+
+.task-decomposition-container .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-decomposition-container .form-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.task-decomposition-container .form-group input,
+.task-decomposition-container .form-group select,
+.task-decomposition-container .form-group textarea {
+    padding: 12px;
+    border: 2px solid #e1e8ed;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+    background: white;
+}
+
+.task-decomposition-container .form-group input:focus,
+.task-decomposition-container .form-group select:focus,
+.task-decomposition-container .form-group textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.task-decomposition-container .form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ========== 标准和约束条件 ========== */
+.criteria-section,
+.constraints-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.criteria-group,
+.constraint-group {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.criteria-group label,
+.constraint-group label {
+    font-size: 14px;
+    color: #7f8c8d;
+    margin-bottom: 12px;
+    display: block;
+    font-weight: 600;
+}
+
+.criteria-items,
+.constraint-items {
+    margin-top: 10px;
+}
+
+.criteria-item,
+.constraint-item {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.criteria-input,
+.constraint-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background: white;
+}
+
+.criteria-input:focus,
+.constraint-input:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.add-criteria,
+.add-constraint {
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-criteria:hover,
+.add-constraint:hover {
+    background: #219a52;
+    transform: scale(1.05);
+}
+
+/* ========== 按钮样式 ========== */
+.task-decomposition-container .form-actions {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.task-decomposition-container .btn {
+    padding: 14px 35px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 160px;
+}
+
+.task-decomposition-container .btn-primary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.task-decomposition-container .btn-primary:hover {
+    background: linear-gradient(135deg, #2980b9, #2573a7);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+}
+
+.task-decomposition-container .btn-secondary {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    color: white;
+    box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+}
+
+.task-decomposition-container .btn-secondary:hover {
+    background: linear-gradient(135deg, #8e44ad, #7d3c98);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(155, 89, 182, 0.4);
+}
+
+.task-decomposition-container .btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ========== 结果区域样式 ========== */
+.task-result,
+.match-result {
+    margin-top: 20px;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+/* ========== 任务卡片样式 ========== */
+.task-cards,
+.match-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.task-card,
+.match-card {
+    background: white;
+    border: 1px solid #e1e8ed;
+    border-radius: 10px;
+    padding: 25px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.task-card:hover,
+.match-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    border-color: #3498db;
+}
+
+.task-card h5,
+.match-card h5 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.task-card p,
+.match-card p {
+    color: #5a6c7d;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.task-card strong,
+.match-card strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.task-card .task-meta,
+.match-card .match-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.task-card .assigned-to,
+.match-card .assigned-to {
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.3);
+}
+
+/* ========== 加载状态 ========== */
+.loading {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========== 删除按钮样式 ========== */
+.delete-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.delete-btn:hover {
+    background: #c0392b;
+    transform: scale(1.1);
+}
+
+.date-hint {
+    color: #7f8c8d;
+    font-size: 0.8rem;
+    margin-top: 6px;
+    display: block;
+    font-style: italic;
+}
+
+/* ========== 响应式设计 ========== */
+@media (max-width: 768px) {
+    .task-decomposition-container {
+        padding: 20px 15px;
+    }
+    
+    .task-decomposition-container .input-section,
+    .task-decomposition-container .result-section {
+        padding: 20px;
+    }
+    
+    .criteria-section,
+    .constraints-section {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .result-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .task-cards,
+    .match-cards {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .task-decomposition-container .btn {
+        padding: 12px 25px;
+        min-width: 140px;
+    }
+}
+
+@media (max-width: 480px) {
+    .task-decomposition-container {
+        padding: 15px 10px;
+    }
+    
+    .task-decomposition-container h2 {
+        font-size: 1.6rem;
+        margin-bottom: 20px;
+    }
+    
+    .task-decomposition-container h3 {
+        font-size: 1.2rem;
+    }
+    
+    .criteria-item,
+    .constraint-item {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .add-criteria,
+    .add-constraint {
+        align-self: flex-start;
+    }
+}
