@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import mysql.connector
 import my_dify_api
+import json
 # call_for_task_generate("生成分解后的任务json列表", "我们小组有6个人，要求是对马原第三章进行扩展ppt汇报")
 # call_for_greeting_summarize("总结","./test_file/video.mp3")
 # call_for_greeting_translate("总结","./test_file/video.mp3")
@@ -355,6 +356,200 @@ def member_refresh():
         return standard_response(False, message=f'刷新成员列表错误: {str(e)}')
 
 # ==================== 智能任务匹配模块 ====================
+@app.route('/api/taskgenerate', methods=['POST'])
+def task_generate():
+    """
+    任务匹配算法接口
+    根据user_id查询成员，对传入的任务列表进行智能匹配
+    """
+    try:
+        data = request.json or {}
+        
+        user_id = get_user_id_from_json(data)
+        if not user_id:
+            return standard_response(False, message='缺少必要字段: user_id')
+        
+        tasks = data.get('tasks', [])
+        if not tasks or not isinstance(tasks, list):
+            return standard_response(False, message='缺少任务列表或格式错误')
+        
+        # 从数据库查询该用户的所有成员
+        conn = get_db_connection('my_database')
+        if not conn:
+            return standard_response(False, message='数据库连接失败')
+        
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            """
+            SELECT id, name, tech_stack, quality_score, workload_score, 
+                   collaboration_score, completion_score
+            FROM member
+            WHERE user_id = %s
+            """,
+            (user_id,)
+        )
+        members = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        if not members:
+            return standard_response(False, message='该用户没有团队成员，请先添加成员')
+        
+        # 处理成员的tech_stack字段（JSON字符串转列表）
+        for member in members:
+            try:
+                if member.get('tech_stack'):
+                    member['tech_stack'] = json.loads(member['tech_stack']) if isinstance(member['tech_stack'], str) else member['tech_stack']
+                else:
+                    member['tech_stack'] = []
+            except (json.JSONDecodeError, TypeError):
+                member['tech_stack'] = []
+        
+        # 执行任务匹配
+        matched_results = []
+        for task in tasks:
+            task_desc = task.get('做什么', '')
+            task_tech_str = task.get('技术栈', '')
+            
+            # 将技术栈字符串转换为列表（处理逗号分隔）
+            task_tech_list = []
+            if task_tech_str:
+                task_tech_list = [tech.strip() for tech in str(task_tech_str).split(',') if tech.strip()]
+            
+            # 找到最佳匹配的成员
+            best_member = _find_best_member_for_task(task_tech_list, members)
+            
+            # 构建返回结果
+            matched_results.append({
+                '做什么': task_desc,
+                '人员': best_member['member_name']
+            })
+            
+            # 更新成员负载（模拟增加负载）
+            _update_member_workload(members, best_member['member_id'])
+        
+        return standard_response(True, data={'matched_tasks': matched_results})
+        
+    except Exception as e:
+        return standard_response(False, message=f'任务匹配错误: {str(e)}')
+
+
+def _find_best_member_for_task(task_tech_list, members):
+    """
+    为单个任务找到最合适的成员
+    """
+    best_match = None
+    best_score = -1
+    
+    for member in members:
+        member_tech = member.get('tech_stack', [])
+        if not isinstance(member_tech, list):
+            member_tech = []
+        
+        # 计算技术栈匹配分数（权重60%）
+        tech_match_score = _calculate_tech_stack_match(task_tech_list, member_tech)
+        
+        # 计算属性综合分数（权重30%）
+        attribute_score = _calculate_attribute_score(member)
+        
+        # 计算负载惩罚分数（权重10%）
+        workload_penalty = _calculate_workload_penalty(member)
+        
+        # 计算综合评分：技术栈匹配(60%) + 属性评分(30%) + 负载惩罚(10%)
+        total_score = (
+            tech_match_score * 0.6 +
+            attribute_score * 0.3 +
+            workload_penalty * 0.1
+        )
+        
+        if total_score > best_score:
+            best_score = total_score
+            best_match = {
+                'member_id': member['id'],
+                'member_name': member['name'],
+                'match_score': round(total_score, 2)
+            }
+    
+    # 如果没有找到匹配的成员，返回第一个成员
+    if not best_match and members:
+        best_match = {
+            'member_id': members[0]['id'],
+            'member_name': members[0]['name'],
+            'match_score': 0.0
+        }
+    
+    return best_match
+
+
+def _calculate_tech_stack_match(required_tech, member_tech):
+    """
+    计算技术栈匹配度
+    支持模糊匹配（包含关系）
+    """
+    if not required_tech:
+        return 1.0
+    
+    if not member_tech:
+        return 0.0
+    
+    # 转换为小写以便匹配（不区分大小写）
+    required_tech_lower = [tech.lower().strip() for tech in required_tech]
+    member_tech_lower = [tech.lower().strip() if isinstance(tech, str) else str(tech).lower().strip() for tech in member_tech]
+    
+    matched_count = 0
+    for req_tech in required_tech_lower:
+        # 精确匹配
+        if req_tech in member_tech_lower:
+            matched_count += 1
+        else:
+            # 模糊匹配：检查是否包含关键词
+            for mem_tech in member_tech_lower:
+                if req_tech in mem_tech or mem_tech in req_tech:
+                    matched_count += 1
+                    break
+    
+    match_ratio = matched_count / len(required_tech)
+    return min(match_ratio, 1.0)
+
+
+def _calculate_attribute_score(member):
+    """
+    计算成员属性综合分
+    权重：质量(50%) + 协作(30%) + 完成度(20%)
+    """
+    quality = float(member.get('quality_score', 0) or 0)
+    collaboration = float(member.get('collaboration_score', 0) or 0)
+    completion = float(member.get('completion_score', 0) or 0)
+    
+    # 按照权重计算加权分数，并归一化到0-1范围
+    # 原始分数范围0-10，加权后除以10得到0-1的范围
+    weighted_score = (quality * 0.5 + collaboration * 0.3 + completion * 0.2) / 10.0
+    
+    return min(max(weighted_score, 0.0), 1.0)
+
+
+def _calculate_workload_penalty(member):
+    """
+    计算负载惩罚系数
+    负载越高，惩罚越大，分数越低
+    """
+    workload = float(member.get('workload_score', 0) or 0)
+    
+    # 负载值0-10转换为0-1的系数
+    penalty = 1.0 - (workload / 10.0)
+    return max(penalty, 0.0)
+
+
+def _update_member_workload(members, member_id):
+    """
+    更新成员负载值（仅在内存中，不更新数据库）
+    每次分配任务，成员负载增加1，最高不超过10
+    """
+    for member in members:
+        if member['id'] == member_id:
+            current_workload = float(member.get('workload_score', 0) or 0)
+            member['workload_score'] = min(current_workload + 1, 10)
+            break
 
 # ==================== AI功能模块 ====================需要接上my_dify_api
 @app.route('/api/ai/<action>', methods=['POST'])
