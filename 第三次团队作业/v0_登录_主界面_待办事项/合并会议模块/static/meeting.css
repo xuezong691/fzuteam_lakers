@@ -1,0 +1,119 @@
+/* static/meeting.css - 会议功能专用CSS（当前HTML已内联基础样式，此文件用于后续扩展） */
+.meeting-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+.meeting-card {
+  background: #f0f8fb;
+  padding: 20px;
+  border-radius: 8px;
+  margin: 15px 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.meeting-form-group {
+  margin-bottom: 20px;
+}
+.meeting-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+.meeting-form-control {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+.meeting-form-control:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+}
+.meeting-btn-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.meeting-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+.meeting-btn-primary {
+  background: #3498db;
+  color: white;
+}
+.meeting-btn-success {
+  background: #2ecc71;
+  color: white;
+}
+.meeting-btn-default {
+  background: #ecf0f1;
+  color: #333;
+  border: 1px solid #ddd;
+}
+.meeting-btn:hover {
+  opacity: 0.9;
+}
+.meeting-result-area {
+  margin-bottom: 20px;
+}
+.meeting-result-text {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.meeting-result-text:read-only {
+  background: #f8f9fa;
+  cursor: default;
+}
+.meeting-download-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  justify-content: flex-end;
+}
+.meeting-download-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: white;
+  transition: background-color 0.2s;
+}
+.meeting-download-btn.transcribe {
+  background: #95a5a6;
+}
+.meeting-download-btn.summary {
+  background: #e67e22;
+}
+.meeting-download-btn:hover {
+  opacity: 0.9;
+}
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .meeting-btn-group {
+    flex-direction: column;
+  }
+  .meeting-btn {
+    width: 100%;
+  }
+  .meeting-download-group {
+    flex-direction: column;
+  }
+  .meeting-download-btn {
+    width: 100%;
+  }
+}
