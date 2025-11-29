@@ -25,6 +25,20 @@
     }
 
     /* ========== 左侧边栏 ========== */
+      /* 团队名称显示样式 */
+        .team-name-display {
+          position: absolute;
+          bottom: 20px;
+          left: 0;
+          width: 100%;
+          text-align: center;
+          font-size: 18px;          /* 字体更大 */
+          color: #ffffff;           /* 白色字体 */
+          padding: 0 10px;
+          box-sizing: border-box;
+          font-weight: 600;         /* 稍微加粗，更清晰 */
+          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* 可选：增加一点阴影，提升可读性（尤其在浅色背景上） */
+        }
     .sidebar {
       width: 240px;
       background: #2c3e50;
@@ -170,6 +184,7 @@
       </li>
 
     </ul>
+      <div class="team-name-display" id="teamNameDisplay"></div>
   </div>
 
   <!-- 右侧内容区 -->
@@ -504,6 +519,18 @@
           window.AIChat.init();
         } else {
           console.error('AIChat module not loaded properly');
+        }
+      });
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const teamName = localStorage.getItem('teamName');
+        const displayEl = document.getElementById('teamNameDisplay');
+
+        if (teamName) {
+          displayEl.textContent = `团队：${teamName}`;
+        } else {
+          displayEl.textContent = '未设置团队名称';
         }
       });
     </script>
