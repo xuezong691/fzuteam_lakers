@@ -733,5 +733,5 @@ def health_check():
 
 if __name__ == '__main__':
     # test_tg()
-    app.run(debug=False, port=5000,threaded=True)
+    app.run(host='0.0.0.0', port=5000, debug=False, threaded=True)
     # print(my_dify_api.call_for_task_generate("生成分解后的任务json列表", "我们小组有6个人，要求是对马原第三章进行扩展ppt汇报"))
