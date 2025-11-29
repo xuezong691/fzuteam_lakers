@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>系统主界面</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='team.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='todotask.css') }}">
+  <!-- 引入AI聊天模块的CSS样式 -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='ai-chat.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='task_decomposition.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='meeting.css') }}">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    }
+
+    body {
+      display: flex;
+      min-height: 100vh;
+      background-color: #f8f9fa;
+    }
+
+    /* ========== 左侧边栏 ========== */
+    .sidebar {
+      width: 240px;
+      background: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .logo-container {
+      padding: 20px;
+      border-bottom: 1px solid #34495e;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3498db;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo img {
+      width: 36px;
+      height: 36px;
+      background: #3498db;
+      border-radius: 6px;
+    }
+
+    .nav-links {
+      padding: 20px 0;
+      list-style: none;
+    }
+
+    .nav-links li {
+      padding: 12px 24px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-links li:hover,
+    .nav-links li.active {
+      background: #34495e;
+      color: #3498db;
+    }
+
+    .nav-links li i {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    /* ========== 主内容区 ========== */
+    .main-content {
+      flex: 1;
+      margin-left: 240px;
+      padding: 30px;
+      background: #ffffff;
+    }
+
+    .page {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    .page-content {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      min-height: 500px;
+    }
+
+    /* 响应式：小屏隐藏侧边栏（可选） */
+    @media (max-width: 768px) {
+      .sidebar {
+        width: 70px;
+      }
+      .sidebar .logo span,
+      .sidebar .nav-links li span {
+        display: none;
+      }
+      .main-content {
+        margin-left: 70px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 左侧导航栏 -->
+  <div class="sidebar">
+    <div class="logo-container">
+      <div class="logo">
+        <span>你好！小办同学</span>
+      </div>
+    </div>
+    <ul class="nav-links" id="navLinks">
+
+      <li data-page="dashboard" class="active">
+        <span>💡</span>
+        <span>AI助手</span>
+      </li>
+
+      <li data-page="data">
+        <span>🧑‍💼</span>
+        <span>成员数据</span>
+      </li>
+
+      <li data-page="meeting">
+        <span>📄</span>
+        <span>会议助手</span>
+      </li>
+
+      <li data-page="task_generater">
+        <span>🧩</span>
+        <span>智能任务分解</span>
+      </li>
+
+      <li data-page="todotask">
+        <span>📍</span>
+        <span>事项看板</span>
+      </li>
+
+    </ul>
+  </div>
+
+  <!-- 右侧内容区 -->
+  <div class="main-content">
+    <!-- AI聊天模块 - 添加完整的对话界面 -->
+    <div class="page active" id="page-dashboard">
+      <h2>💡 来和大模型聊天</h2>
+      <div class="page-content">
+        <div class="ai-chat-container">
+          <div class="ai-chat-header">
+            <h3>小办同学</h3>
+            <button type="button" id="clearChatBtn" class="ai-chat-clear-btn">清空记录</button>
+          </div>
+          <div id="chatMessages" class="ai-chat-messages"></div>
+          <form id="chatForm" class="ai-chat-input-area">
+            <input
+              type="text"
+              id="chatInput"
+              class="ai-chat-input"
+              placeholder="输入您的问题..."
+              autocomplete="off"
+              required
+            />
+            <button type="submit" class="ai-chat-send-btn">发送</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- 团队成员 -->
+    <div class="page" id="page-data">
+      <!-- 团队管理模块 -->
+      <!-- 团队管理模块 -->
+        <div class="team-management">
+          <h2>🧑 💼 成员数据</h2>
+          <p>团队成员管理</p>
+
+          <div class="member-controls">
+            <button id="btnRefreshMembers" class="btn-primary">刷新成员</button>
+          </div>
+
+          <div id="memberBoard" class="member-board">
+            <!-- 成员卡片将在这里动态渲染 -->
+          </div>
+
+          <div class="add-member-form">
+            <h3>添加新成员</h3>
+            <form id="memberForm">
+              <div class="form-group">
+                <label for="memberName">姓名:</label>
+                <input type="text" id="memberName" required placeholder="请输入成员姓名">
+              </div>
+              <div class="form-group">
+                <label for="memberTechStack">技术栈 (用逗号分隔):</label>
+                <input type="text" id="memberTechStack" placeholder="例如: JavaScript, Python, SQL">
+              </div>
+              <button type="submit" class="btn-primary">添加成员</button>
+            </form>
+          </div>
+        </div>
+    </div>
+
+    <!-- 会议助手 -->
+    <div class="page" id="page-meeting">
+      <h2>📄 会议语言转文字、一键生成摘要</h2>
+      <div class="page-content">
+        <div style="max-width: 800px; margin: 0 auto;">
+          <!-- 功能说明 -->
+          <p>自动生成会议纪要，支持音频直接转写为文字后生成摘要</p>
+
+          <!-- 核心功能区 -->
+          <div style="background: #f0f8fb; padding: 20px; border-radius: 8px; margin: 15px 0;">
+            <!-- 第一步：音频上传 -->
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 500;">1. 上传会议音频（支持mp3、wav、m4a）</label>
+              <input type="file" id="meetingAudioFile" accept="audio/*" style="padding: 8px; width: 100%; border: 1px solid #ddd; border-radius: 4px;">
+              <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">单个文件不超过200MB，建议音频时长不超过120分钟</p>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+              <button id="startTranscribeBtn" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                音频转文字
+              </button>
+              <button id="generateSummaryBtn" style="padding: 10px 20px; background: #2ecc71; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                生成会议摘要
+              </button>
+              <button id="clearAllBtn" style="padding: 10px 20px; background: #ecf0f1; color: #333; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                清空内容
+              </button>
+            </div>
+
+            <!-- 转写结果区域 -->
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 8px; font-weight: 500;">转写结果（可编辑）</label>
+              <textarea id="transcribeResult" rows="8" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical; font-size: 14px; line-height: 1.5;" placeholder="音频转写后的文字会显示在这里..."></textarea>
+            </div>
+
+            <!-- 摘要结果区域 -->
+            <div>
+              <label style="display: block; margin-bottom: 8px; font-weight: 500;">会议摘要</label>
+              <textarea id="summaryResult" rows="6" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical; font-size: 14px; line-height: 1.5; background: #f8f9fa;" placeholder="生成的会议摘要会显示在这里..." readonly></textarea>
+
+              <!-- 导出按钮 -->
+              <div style="display: flex; gap: 10px; margin-top: 10px; justify-content: flex-end;">
+                <button id="downloadTranscribeBtn" style="padding: 8px 16px; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                  下载转写文本
+                </button>
+                <button id="downloadSummaryBtn" style="padding: 8px 16px; background: #e67e22; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                  下载摘要报告
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 智能任务分解 -->
+    <div class="page" id="page-task_generater">
+    <h2>🧩 智能任务分解</h2>
+    <div class="page-content">
+        <div class="task-decomposition-container">
+            <!-- 任务输入表单 -->
+            <div class="input-section">
+                <h3>任务信息输入</h3>
+                <form id="taskInputForm" class="task-form">
+                    <div class="form-group">
+                        <label for="taskType">任务类型 *</label>
+                        <select id="taskType" required>
+                            <option value="">请选择任务类型</option>
+                            <option value="software">软件开发</option>
+                            <option value="ppt">PPT制作</option>
+                            <option value="research">研究项目</option>
+                            <option value="study">学习任务</option>
+                            <option value="management">项目管理</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="background">项目背景和动机 *</label>
+                        <textarea id="background" rows="3" required placeholder="请输入项目背景、目标和动机..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="finalDeliverable">最终交付成果 *</label>
+                        <textarea id="finalDeliverable" rows="3" required placeholder="请输入最终要交付的具体成果，如PPT、报告、软件等..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="timeLimit">限定时长（天） *</label>
+                        <input type="number" id="timeLimit" required min="1" max="365"
+                               placeholder="请输入任务限定的天数">
+                        <small class="date-hint">请输入任务需要在多少天内完成</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>质量要求</label>
+                        <div class="criteria-section">
+                            <div class="criteria-group">
+                                <label>必须满足的要求</label>
+                                <div id="mustHaveContainer" class="criteria-items">
+                                    <div class="criteria-item">
+                                        <input type="text" class="criteria-input" placeholder="例如：必须使用Python开发">
+                                        <button type="button" class="add-criteria" onclick="addCriteria('mustHave')">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="criteria-group">
+                                <label>可选优化</label>
+                                <div id="niceToHaveContainer" class="criteria-items">
+                                    <div class="criteria-item">
+                                        <input type="text" class="criteria-input" placeholder="例如：支持移动端访问">
+                                        <button type="button" class="add-criteria" onclick="addCriteria('niceToHave')">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>约束条件</label>
+                        <div class="constraints-section">
+                            <div class="constraint-group">
+                                <label>禁止事项</label>
+                                <div id="forbiddenContainer" class="constraint-items">
+                                    <div class="constraint-item">
+                                        <input type="text" class="constraint-input" placeholder="例如：不能使用付费软件">
+                                        <button type="button" class="add-constraint" onclick="addConstraint('forbidden')">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="constraint-group">
+                                <label>前提假设</label>
+                                <div id="assumptionsContainer" class="constraint-items">
+                                    <div class="constraint-item">
+                                        <input type="text" class="constraint-input" placeholder="例如：假设团队成员都会Python">
+                                        <button type="button" class="add-constraint" onclick="addConstraint('assumptions')">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="generateTaskBtn" class="btn btn-primary">生成任务分解</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 结果显示区域 -->
+            <div class="result-section">
+                <h3>任务分解结果</h3>
+                <div id="taskResult" class="task-result" style="display: none;">
+                    <div class="result-header">
+                        <h4>AI生成的任务列表</h4>
+<!--                        <button type="button" id="matchTaskBtn" class="btn btn-secondary">智能成员匹配</button>-->
+                    </div>
+                    <div id="taskCards" class="task-cards">
+                        <!-- 任务卡片将通过JS动态生成 -->
+                    </div>
+                </div>
+
+                <div id="matchResult" class="match-result" style="display: none;">
+                    <h4>成员匹配结果</h4>
+                    <div id="matchCards" class="match-cards">
+                        <!-- 匹配结果卡片将通过JS动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- 事项看板 -->
+    <div class="page" id="page-todotask">
+      <h2>📍 事项看板</h2>
+      <div class="page-content">
+        <div class="todo-wrapper">
+          <!-- 顶部：标题 + 刷新按钮 -->
+          <div class="todo-header">
+            <div>
+              <h3>团队待办事项</h3>
+              <p class="todo-subtitle">根据当前登录用户加载任务</p>
+            </div>
+            <div class="todo-actions">
+              <button type="button" id="btnRefreshTasks" class="btn-secondary">
+                刷新任务
+              </button>
+            </div>
+          </div>
+
+          <!-- 添加任务表单 -->
+          <form id="taskForm" class="task-form">
+            <div class="task-form-row">
+              <div class="task-form-field">
+                <label for="taskTime">日期</label>
+                <input type="date" id="taskTime" name="time" required />
+              </div>
+              <div class="task-form-field">
+                <label for="taskPlace">地点</label>
+                <input
+                  type="text"
+                  id="taskPlace"
+                  name="place"
+                  placeholder="例如：实验室A"
+                />
+              </div>
+            </div>
+
+            <div class="task-form-row">
+              <div class="task-form-field">
+                <label for="taskStaff">负责人</label>
+                <input
+                  type="text"
+                  id="taskStaff"
+                  name="staff"
+                  placeholder="例如：张三"
+                />
+              </div>
+              <div class="task-form-field">
+                <label for="taskUrgency">紧急程度</label>
+                <select id="taskUrgency" name="urgency">
+                  <option value="1">一般</option>
+                  <option value="2">重要</option>
+                  <option value="3">紧急</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="task-form-row">
+              <div class="task-form-field full">
+                <label for="taskSomething">任务内容</label>
+                <textarea
+                  id="taskSomething"
+                  name="something"
+                  rows="2"
+                  placeholder="需要完成的事项..."
+                  required
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="task-form-actions">
+              <button type="submit" class="btn-primary">
+                添加任务
+              </button>
+            </div>
+          </form>
+
+          <!-- 任务卡片容器 -->
+          <div id="taskBoard" class="task-board">
+            <p class="task-empty">
+              目前还没有任务，点击上方“刷新任务”从后端加载数据，或者先添加一条任务。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+    <!-- 引入axios和AI聊天模块的JS -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{{ url_for('static', filename='ai-chat.js') }}"></script>
+    <script src="{{ url_for('static', filename='task_decomposition.js') }}"></script>
+    <script src="{{ url_for('static', filename='meeting.js') }}"></script>
+    <script>
+      // 确保DOM加载完成后初始化
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.AIChat) {
+          window.AIChat.init();
+        } else {
+          console.error('AIChat module not loaded properly');
+        }
+      });
+    </script>
+    <script>
+    // 获取当前登录用户的 userId（登录时写入 localStorage）
+    function getCurrentUserId() {
+      return localStorage.getItem("userId");
+    }
+
+    // 渲染任务列表为卡片
+    function renderTasks(tasks) {
+      var board = document.getElementById("taskBoard");
+      if (!board) return;
+
+      board.innerHTML = "";
+
+      if (!tasks || tasks.length === 0) {
+        var empty = document.createElement("p");
+        empty.className = "task-empty";
+        empty.textContent = "没有任务，试试添加一条或点击“刷新任务”。";
+        board.appendChild(empty);
+        return;
+      }
+
+      tasks.forEach(function (task) {
+        var card = document.createElement("div");
+        card.className = "task-card";
+
+        var title = document.createElement("div");
+        title.className = "task-title";
+        title.textContent = task.something || "未填写任务内容";
+
+        var meta = document.createElement("div");
+        meta.className = "task-meta";
+
+        var timeSpan = document.createElement("span");
+        timeSpan.textContent = "日期：" + (task.time || "-");
+
+        var placeSpan = document.createElement("span");
+        placeSpan.textContent = "地点：" + (task.place || "-");
+
+        var staffSpan = document.createElement("span");
+        staffSpan.textContent = "负责人：" + (task.staff || "-");
+
+        meta.appendChild(timeSpan);
+        meta.appendChild(placeSpan);
+        meta.appendChild(staffSpan);
+
+        var content = document.createElement("div");
+        content.className = "task-content";
+        content.textContent = task.something || "";
+
+        var footer = document.createElement("div");
+        footer.className = "task-footer";
+
+        var urgencySpan = document.createElement("span");
+        urgencySpan.className = "task-urgency";
+        urgencySpan.textContent = "紧急程度：" + (task.urgency || 1);
+
+        var deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.className = "task-delete-btn";
+        deleteBtn.textContent = "删除";
+        deleteBtn.setAttribute("data-id", task.id);
+
+        footer.appendChild(urgencySpan);
+        footer.appendChild(deleteBtn);
+
+        card.appendChild(title);
+        card.appendChild(meta);
+        // card.appendChild(content);
+        card.appendChild(footer);
+
+        board.appendChild(card);
+      });
+    }
+
+    // 调用 /api/task/refresh 获取任务列表
+    async function refreshTasks() {
+      var userId = getCurrentUserId();
+      if (!userId) {
+        alert("未找到用户ID，请重新登录后再试。");
+        return;
+      }
+
+      try {
+        var response = await fetch("/api/task/refresh", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            user_id: parseInt(userId, 10)
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("网络错误，状态码：" + response.status);
+        }
+
+        var result = await response.json();
+        if (result.success) {
+          renderTasks(result.tasks  || []);
+        } else {
+          alert(result.message || "刷新任务失败");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("刷新任务失败：" + err.message);
+      }
+    }
+
+    // 调用 /api/task/add 添加任务
+    async function handleAddTask(event) {
+      event.preventDefault();
+
+      var userId = getCurrentUserId();
+      if (!userId) {
+        alert("未找到用户ID，请重新登录后再试。");
+        return;
+      }
+
+      var timeInput = document.getElementById("taskTime");
+      var placeInput = document.getElementById("taskPlace");
+      var staffInput = document.getElementById("taskStaff");
+      var urgencySelect = document.getElementById("taskUrgency");
+      var somethingInput = document.getElementById("taskSomething");
+
+      var payload = {
+        user_id: parseInt(userId, 10),
+        time: timeInput.value,
+        place: placeInput.value,
+        staff: staffInput.value,
+        something: somethingInput.value,
+        urgency: parseInt(urgencySelect.value || "1", 10)
+      };
+
+      if (!payload.time || !payload.something) {
+        alert("日期和任务内容为必填项。");
+        return;
+      }
+
+      try {
+        var response = await fetch("/api/task/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error("网络错误，状态码：" + response.status);
+        }
+
+        var result = await response.json();
+        if (result.success) {
+          // 清空表单
+          placeInput.value = "";
+          staffInput.value = "";
+          somethingInput.value = "";
+          urgencySelect.value = "1";
+          // 重新刷新列表
+          await refreshTasks();
+        } else {
+          alert(result.message || "添加任务失败");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("添加任务失败：" + err.message);
+      }
+    }
+
+    // 调用 /api/task/delete 删除任务
+    async function deleteTaskById(id) {
+      if (!id) return;
+      if (!confirm("确认删除这条任务吗？")) return;
+
+      try {
+        var response = await fetch("/api/task/delete", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ id: id })
+        });
+
+        if (!response.ok) {
+          throw new Error("网络错误，状态码：" + response.status);
+        }
+
+        var result = await response.json();
+        if (result.success) {
+          await refreshTasks();
+        } else {
+          alert(result.message || "删除任务失败");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("删除任务失败：" + err.message);
+      }
+    }
+
+    // 事项看板内事件绑定（按钮、卡片删除）
+    function initTodoTaskEvents() {
+      var refreshBtn = document.getElementById("btnRefreshTasks");
+      if (refreshBtn) {
+        refreshBtn.addEventListener("click", function () {
+          refreshTasks();
+        });
+      }
+
+      var taskForm = document.getElementById("taskForm");
+      if (taskForm) {
+        taskForm.addEventListener("submit", handleAddTask);
+      }
+
+      var taskBoard = document.getElementById("taskBoard");
+      if (taskBoard) {
+        taskBoard.addEventListener("click", function (event) {
+          var target = event.target;
+          if (target.classList.contains("task-delete-btn")) {
+            var id = target.getAttribute("data-id");
+            deleteTaskById(id);
+          }
+        });
+      }
+    }
+
+    // ========== 左侧导航：页面切换逻辑 ==========
+    document.querySelectorAll(".nav-links li").forEach(function (item) {
+      item.addEventListener("click", function () {
+        var pageId = this.getAttribute("data-page");
+
+        // 移除所有 active
+        document
+          .querySelectorAll(".nav-links li")
+          .forEach(function (li) {
+            li.classList.remove("active");
+          });
+        document
+          .querySelectorAll(".page")
+          .forEach(function (p) {
+            p.classList.remove("active");
+          });
+
+        // 激活当前项
+        this.classList.add("active");
+        var pageElement = document.getElementById("page-" + pageId);
+        if (pageElement) {
+          pageElement.classList.add("active");
+        }
+
+        // 如果切换到事项看板，自动刷新一次
+        if (pageId === "todotask") {
+          refreshTasks();
+        }
+      });
+    });
+
+    // 退出登录
+    function logout() {
+      localStorage.removeItem("userId");
+      localStorage.removeItem("teamName");
+      window.location.href = "/"; // 跳回登录页
+    }
+
+    // 页面加载时恢复用户信息（用于“个人中心”）
+    window.addEventListener("DOMContentLoaded", function () {
+      var userId = localStorage.getItem("userId");
+      var teamName = localStorage.getItem("teamName");
+
+      // 如果你页面里真的有对应元素，可以解开下面的注释来显示
+      // var userIdSpan = document.getElementById("displayUserId");
+      // var teamNameSpan = document.getElementById("displayTeamName");
+
+      if (userId && teamName) {
+        // if (userIdSpan) userIdSpan.textContent = userId;
+        // if (teamNameSpan) teamNameSpan.textContent = teamName;
+      } else {
+        // 未登录则跳转回首页
+        window.location.href = "/";
+      }
+
+      // 初始化事项看板的事件（按钮、表单、卡片删除）
+      initTodoTaskEvents();
+    });
+
+    // ========== 团队管理模块 ==========
+    // 渲染成员列表为卡片
+    function renderMembers(members) {
+        var container = document.getElementById("memberBoard");
+        if (!container) return;
+
+        container.innerHTML = "";
+
+        if (!members || members.length === 0) {
+            var empty = document.createElement("p");
+            empty.className = "member-empty";
+            empty.textContent = "没有团队成员，点击添加按钮添加新成员。";
+            container.appendChild(empty);
+            return;
+        }
+
+        members.forEach(function(member) {
+            var card = document.createElement("div");
+            card.className = "member-card";
+            card.setAttribute("data-id", member.id);
+
+            var header = document.createElement("div");
+            header.className = "member-header";
+
+            var name = document.createElement("h3");
+            name.textContent = member.name || "未命名";
+            name.className = "member-name";
+
+            var techStack = document.createElement("div");
+            techStack.className = "member-tech";
+            var techs = member.tech_stack && Array.isArray(member.tech_stack) ?
+                member.tech_stack.join(", ") : "无技术栈";
+            techStack.textContent = "技术栈: " + techs;
+
+            header.appendChild(name);
+            header.appendChild(techStack);
+
+            var scores = document.createElement("div");
+            scores.className = "member-scores";
+
+            var quality = document.createElement("span");
+            quality.textContent = "质量: " + (member.quality_score || "0.00");
+
+            var workload = document.createElement("span");
+            workload.textContent = "工作量: " + (member.workload_score || "0.00");
+
+            var collaboration = document.createElement("span");
+            collaboration.textContent = "协作: " + (member.collaboration_score || "0.00");
+
+            scores.appendChild(quality);
+            scores.appendChild(workload);
+            scores.appendChild(collaboration);
+
+            var footer = document.createElement("div");
+            footer.className = "member-footer";
+
+            var deleteBtn = document.createElement("button");
+            deleteBtn.type = "button";
+            deleteBtn.className = "member-delete-btn";
+            deleteBtn.textContent = "删除";
+            deleteBtn.setAttribute("data-id", member.id);
+
+            footer.appendChild(deleteBtn);
+            card.appendChild(header);
+            card.appendChild(scores);
+            card.appendChild(footer);
+
+            container.appendChild(card);
+        });
+    }
+
+    // 调用 /api/member/list 获取成员列表
+    async function refreshMembers() {
+        var userId = getCurrentUserId();
+        if (!userId) {
+            alert("未找到用户ID，请重新登录后再试。");
+            return;
+        }
+
+        try {
+            var response = await fetch("/api/member/list", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user_id: parseInt(userId, 10)
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error("网络错误，状态码：" + response.status);
+            }
+
+            var result = await response.json();
+
+            // 修正1：根据后端的响应结构，直接访问 result.members 而不是 result.data
+            if (result.success) {
+              // 修正2：同时兼容两种可能的结构，增加健壮性
+              const members = result.members || (result.data && result.data.members) || [];
+
+              // 新增：确保每个成员对象都包含四个评分属性（如果后端返回了这些属性）
+              members.forEach(member => {
+                  // 保留原有属性，只添加缺失的评分属性
+                  member.quality_score = member.quality_score !== undefined ? member.quality_score : 0.0;
+                  member.workload_score = member.workload_score !== undefined ? member.workload_score : 0.0;
+                  member.collaboration_score = member.collaboration_score !== undefined ? member.collaboration_score : 0.0;
+                  member.completion_score = member.completion_score !== undefined ? member.completion_score : 0.0;
+              });
+
+              renderMembers(members);
+
+              // 修正3：如果成员列表为空，提供友好提示
+              if (members.length === 0) {
+                  const memberBoard = document.getElementById('memberBoard');
+                  if (memberBoard) {
+                      memberBoard.innerHTML = `
+                          <div class="member-empty">
+                              <div>👥</div>
+                              <p>暂无团队成员</p>
+                              <p>点击下方"添加新成员"开始创建您的团队</p>
+                          </div>
+                      `;
+                  }
+              }
+          } else {
+                // 修正4：提供更详细的错误信息
+                console.error("后端返回错误:", result);
+                alert(result.message || "刷新成员失败");
+            }
+        } catch (err) {
+            console.error("刷新成员列表时发生错误:", err);
+
+            // 修正5：尝试解析可能的后端错误
+            if (err.message.includes('JSON')) {
+                alert("数据解析错误: 服务器返回了无效的JSON格式。这通常表示后端代码存在错误。");
+            } else if (err.message.includes('404')) {
+                alert("API端点不存在: 请检查后端路由配置是否正确");
+            } else {
+                alert("刷新成员失败: " + (err.message || "未知错误"));
+            }
+        }
+    }
+
+    // 调用 /api/member/add 添加成员
+    async function handleAddMember(event) {
+        event.preventDefault();
+
+        var userId = getCurrentUserId();
+        if (!userId) {
+            alert("未找到用户ID，请重新登录后再试。");
+            return;
+        }
+
+        var nameInput = document.getElementById("memberName");
+        var techStackInput = document.getElementById("memberTechStack");
+
+        var name = nameInput.value.trim();
+        var techStack = techStackInput.value.trim();
+
+        if (!name) {
+            alert("成员姓名为必填项。");
+            return;
+        }
+
+        // 将技术栈转换为数组
+        var techStackArray = [];
+        if (techStack) {
+            techStackArray = techStack.split(",").map(function(item) {
+                return item.trim();
+            }).filter(function(item) {
+                return item !== "";
+            });
+        }
+
+        var payload = {
+            user_id: parseInt(userId, 10),
+            name: name,
+            tech_stack: techStackArray
+        };
+
+        try {
+            var response = await fetch("/api/member/add", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error("网络错误，状态码：" + response.status);
+            }
+
+            var result = await response.json();
+            if (result.success) {
+                // 清空表单
+                nameInput.value = "";
+                techStackInput.value = "";
+
+                // 重新刷新列表
+                await refreshMembers();
+            } else {
+                alert(result.message || "添加成员失败");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("添加成员失败：" + err.message);
+        }
+    }
+
+    // 调用 /api/member/update 更新成员
+    async function updateMember(memberId, updatedData) {
+        try {
+            // 获取当前用户ID
+            var userId = getCurrentUserId();
+            if (!userId) {
+                alert("未找到用户ID，请重新登录后再试。");
+                return false;
+            }
+
+            // 确保技术栈是数组格式
+            if (updatedData.tech_stack && typeof updatedData.tech_stack === 'string') {
+                updatedData.tech_stack = updatedData.tech_stack.split(',').map(item => item.trim()).filter(item => item);
+            }
+
+            // 新增：确保四个评分属性被包含在更新数据中
+            // 如果调用者没有提供这些属性，我们保留它们的当前值（避免重置为0）
+            // 注意：在实际应用中，应该先获取当前成员数据，这里提供默认值作为保护
+            const defaultScores = {
+                quality_score: updatedData.quality_score !== undefined ? updatedData.quality_score : 0.0,
+                workload_score: updatedData.workload_score !== undefined ? updatedData.workload_score : 0.0,
+                collaboration_score: updatedData.collaboration_score !== undefined ? updatedData.collaboration_score : 0.0,
+                completion_score: updatedData.completion_score !== undefined ? updatedData.completion_score : 0.0
+            };
+
+            var response = await fetch("/api/member/update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: memberId,
+                    user_id: parseInt(userId, 10), // 添加user_id
+                    ...updatedData,
+                    // 确保四个评分属性被包含在请求中
+                    ...defaultScores
+                })
+            });
+
+            // 验证响应是否为JSON
+            const contentType = response.headers.get("content-type");
+            if (contentType && !contentType.includes("application/json")) {
+                throw new Error("服务器返回了无效的响应格式");
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`请求失败: ${response.status} ${response.statusText}` +
+                    (errorData.message ? ` - ${errorData.message}` : ''));
+            }
+
+            var result = await response.json();
+
+            // 根据 standard_response 结构处理结果
+            if (result.success) {
+                await refreshMembers();
+                alert("成员信息更新成功！");
+                return true;
+            } else {
+                console.error("更新成员失败:", result);
+                alert(result.message || "更新成员失败");
+                return false;
+            }
+        } catch (err) {
+            console.error("更新成员时发生错误:", err);
+
+            // 详细错误处理
+            let errorMessage = err.message;
+            if (errorMessage.includes('JSON') || errorMessage.includes('Unexpected token')) {
+                errorMessage = "服务器返回了无效的JSON格式。请检查后端是否正确导入了json模块。";
+            } else if (errorMessage.includes('404')) {
+                errorMessage = "API端点不存在。请检查后端路由配置。";
+            }
+
+            alert("更新成员失败: " + errorMessage);
+            return false;
+        }
+    }
+
+    // 调用 /api/member/delete 删除成员
+    async function deleteMemberById(id) {
+        if (!id) {
+            console.error("缺少成员ID，无法删除");
+            return false;
+        }
+
+        if (!confirm("确认删除这位团队成员吗？此操作不可撤销！")) {
+            return false;
+        }
+
+        try {
+            // 获取当前用户ID
+            var userId = getCurrentUserId();
+            if (!userId) {
+                alert("未找到用户ID，请重新登录后再试。");
+                return false;
+            }
+
+            var response = await fetch("/api/member/delete", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id: id,
+                    user_id: parseInt(userId, 10) // 添加user_id
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`请求失败: ${response.status} ${response.statusText}` +
+                    (errorData.message ? ` - ${errorData.message}` : ''));
+            }
+
+            var result = await response.json();
+
+            if (result.success) {
+                await refreshMembers();
+                alert("成员删除成功！");
+                return true;
+            } else {
+                console.error("删除成员失败:", result);
+                alert(result.message || "删除成员失败");
+                return false;
+            }
+        } catch (err) {
+            console.error("删除成员时发生错误:", err);
+
+            // 详细错误处理
+            let errorMessage = err.message;
+            if (errorMessage.includes('JSON') || errorMessage.includes('Unexpected token')) {
+                errorMessage = "服务器返回了无效的JSON格式。这通常表示后端代码存在错误。";
+            } else if (errorMessage.includes('403') || errorMessage.includes('权限')) {
+                errorMessage = "您没有权限执行此操作。请确认您是该成员的所有者。";
+            }
+
+            alert("删除成员失败: " + errorMessage);
+            return false;
+        }
+    }
+
+    // 团队管理面板内事件绑定
+    function initTeamManagementEvents() {
+        var refreshBtn = document.getElementById("btnRefreshMembers");
+        if (refreshBtn) {
+            refreshBtn.addEventListener("click", function() {
+                refreshMembers();
+            });
+        }
+
+        var memberForm = document.getElementById("memberForm");
+        if (memberForm) {
+            memberForm.addEventListener("submit", handleAddMember);
+        }
+
+        var memberBoard = document.getElementById("memberBoard");
+        if (memberBoard) {
+            memberBoard.addEventListener("click", function(event) {
+                var target = event.target;
+
+                // 处理删除按钮点击
+                if (target.classList.contains("member-delete-btn")) {
+                    var id = target.getAttribute("data-id");
+                    deleteMemberById(id);
+                    return;
+                }
+
+                // 处理卡片点击 - 编辑成员
+                if (target.closest(".member-card")) {
+                    var card = target.closest(".member-card");
+                    var id = card.getAttribute("data-id");
+
+                    // 获取当前卡片上的数据
+                    var name = card.querySelector(".member-name").textContent;
+                    var techStack = card.querySelector(".member-tech").textContent.replace("技术栈: ", "");
+
+                    // 新增：获取四个评分属性
+                    var qualityScore = parseFloat(card.getAttribute("data-quality-score") || "80.0");
+                    var workloadScore = parseFloat(card.getAttribute("data-workload-score") || "50.0");
+                    var collaborationScore = parseFloat(card.getAttribute("data-collaboration-score") || "80.0");
+                    var completionScore = parseFloat(card.getAttribute("data-completion-score") || "0.0");
+
+                    // 显示自定义编辑对话框
+                    showEditMemberDialog(id, {
+                        name: name,
+                        tech_stack: techStack,
+                        quality_score: qualityScore,
+                        workload_score: workloadScore,
+                        collaboration_score: collaborationScore,
+                        completion_score: completionScore
+                    });
+                }
+            });
+        }
+    }
+
+    // 新增：显示编辑成员对话框
+    function showEditMemberDialog(memberId, memberData) {
+        // 创建模态对话框容器
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-dialog">
+                <div class="modal-header">
+                    <h3>编辑团队成员</h3>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="editName">姓名</label>
+                        <input type="text" id="editName" class="form-control" value="${memberData.name}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editTechStack">技术栈 (用逗号分隔)</label>
+                        <input type="text" id="editTechStack" class="form-control" value="${memberData.tech_stack || ''}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editWorkload">工作负载 (1-100)</label>
+                        <input type="number" id="editWorkload" class="form-control" min="0" max="100" value="${Math.round(memberData.workload_score)}">
+                    </div>
+
+                    <div class="form-group rating-group">
+                        <label>质量评分</label>
+                        <div class="rating-slider-container">
+                            <input type="range" id="qualitySlider" min="0" max="100" value="${Math.round(memberData.quality_score)}" class="rating-slider">
+                            <div class="rating-value"><span id="qualityValue">${Math.round(memberData.quality_score)}</span>/100</div>
+                            <div class="rating-emoji" id="qualityEmoji">${getEmojiForScore(memberData.quality_score)}</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group rating-group">
+                        <label>协作评分</label>
+                        <div class="rating-slider-container">
+                            <input type="range" id="collaborationSlider" min="0" max="100" value="${Math.round(memberData.collaboration_score)}" class="rating-slider">
+                            <div class="rating-value"><span id="collabValue">${Math.round(memberData.collaboration_score)}</span>/100</div>
+                            <div class="rating-emoji" id="collabEmoji">${getEmojiForScore(memberData.collaboration_score)}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelEdit" class="btn btn-secondary">取消</button>
+                    <button id="saveEdit" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // 添加样式
+        addModalStyles();
+
+        // 获取元素
+        const closeBtn = modal.querySelector('.close-btn');
+        const cancelBtn = modal.querySelector('#cancelEdit');
+        const saveBtn = modal.querySelector('#saveEdit');
+        const qualitySlider = modal.querySelector('#qualitySlider');
+        const collabSlider = modal.querySelector('#collaborationSlider');
+        const qualityValue = modal.querySelector('#qualityValue');
+        const collabValue = modal.querySelector('#collabValue');
+        const qualityEmoji = modal.querySelector('#qualityEmoji');
+        const collabEmoji = modal.querySelector('#collabEmoji');
+
+        // 实时更新质量评分显示
+        qualitySlider.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            qualityValue.textContent = value;
+            qualityEmoji.textContent = getEmojiForScore(value);
+        });
+
+        // 实时更新协作评分显示
+        collabSlider.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            collabValue.textContent = value;
+            collabEmoji.textContent = getEmojiForScore(value);
+        });
+
+        // 关闭对话框
+        function closeModal() {
+            document.body.removeChild(modal);
+        }
+
+        // 事件监听器
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+
+        saveBtn.addEventListener('click', function() {
+            // 收集表单数据
+            const updatedData = {
+                name: modal.querySelector('#editName').value.trim(),
+                tech_stack: modal.querySelector('#editTechStack').value.split(',')
+                    .map(item => item.trim())
+                    .filter(item => item),
+                workload_score: parseInt(modal.querySelector('#editWorkload').value) || 0,
+                quality_score: parseInt(qualitySlider.value),
+                collaboration_score: parseInt(collabSlider.value),
+                // 保持完成度评分不变
+                completion_score: memberData.completion_score
+            };
+
+            // 验证数据
+            if (!updatedData.name) {
+                alert("姓名不能为空");
+                return;
+            }
+
+            // 调用更新API
+            updateMember(memberId, updatedData);
+            closeModal();
+        });
+
+        // 点击遮罩层关闭
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    }
+
+    // 新增：根据评分获取对应的表情
+    function getEmojiForScore(score) {
+        if (score >= 80) return '😄 优秀';
+        if (score >= 60) return '🙂 良好';
+        if (score >= 30) return '😐 一般';
+        return '😞 较差';
+    }
+
+    // 新增：添加模态对话框的样式
+    function addModalStyles() {
+        if (document.getElementById('modal-styles')) return;
+
+        const style = document.createElement('style');
+        style.id = 'modal-styles';
+        style.textContent = `
+            .modal-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+
+            .modal-dialog {
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+                width: 90%;
+                max-width: 500px;
+                overflow: hidden;
+            }
+
+            .modal-header {
+                padding: 16px 20px;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .modal-header h3 {
+                margin: 0;
+                font-size: 1.2rem;
+                color: #333;
+            }
+
+            .close-btn {
+                background: none;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+                color: #999;
+            }
+
+            .close-btn:hover {
+                color: #333;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 6px;
+                font-weight: 500;
+                color: #444;
+            }
+
+            .form-control {
+                width: 100%;
+                padding: 8px 12px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                box-sizing: border-box;
+            }
+
+            .form-control:focus {
+                outline: none;
+                border-color: #4a90e2;
+                box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+            }
+
+            .rating-group {
+                margin-top: 10px;
+            }
+
+            .rating-slider-container {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .rating-slider {
+                flex: 1;
+                height: 8px;
+                -webkit-appearance: none;
+                background: #e0e0e0;
+                border-radius: 4px;
+                outline: none;
+            }
+
+            .rating-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #4a90e2;
+                cursor: pointer;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+
+            .rating-slider::-moz-range-thumb {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                background: #4a90e2;
+                cursor: pointer;
+                border: none;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+
+            .rating-value {
+                min-width: 50px;
+                font-weight: bold;
+                color: #4a90e2;
+            }
+
+            .rating-emoji {
+                min-width: 70px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                text-align: center;
+            }
+
+            .modal-footer {
+                padding: 12px 20px;
+                border-top: 1px solid #eee;
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+            }
+
+            .btn {
+                padding: 8px 16px;
+                border-radius: 4px;
+                border: none;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s;
+            }
+
+            .btn-primary {
+                background-color: #4a90e2;
+                color: white;
+            }
+
+            .btn-primary:hover {
+                background-color: #3a7bc8;
+            }
+
+            .btn-secondary {
+                background-color: #f0f0f0;
+                color: #333;
+            }
+
+            .btn-secondary:hover {
+                background-color: #e0e0e0;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // 初始化团队管理模块
+    document.addEventListener("DOMContentLoaded", function() {
+        // 检查团队管理面板是否存在
+        if (document.getElementById("memberBoard")) {
+            refreshMembers();
+            initTeamManagementEvents();
+        }
+    });
+
+
+  </script>
+
+
+</body>
+</html>
+

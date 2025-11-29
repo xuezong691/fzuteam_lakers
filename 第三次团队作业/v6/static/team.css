@@ -1,0 +1,315 @@
+:root {
+  /* 色彩变量 - 清新柔和的调色板 */
+  --primary-color: #4361ee;
+  --primary-light: #4895ef;
+  --secondary-color: #4cc9f0;
+  --accent-color: #7209b7;
+  --success-color: #38b000;
+  --danger-color: #d90429;
+  --text-dark: #212529;
+  --text-medium: #495057;
+  --text-light: #6c757d;
+  --bg-light: #f8f9ff;
+  --border-color: #e2e6ff;
+  --card-shadow: 0 4px 12px rgba(67, 97, 238, 0.12);
+  --card-hover-shadow: 0 6px 16px rgba(67, 97, 238, 0.18);
+  --transition: all 0.3s ease;
+}
+
+/* 团队管理模块整体样式 */
+.team-management {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.team-management h2 {
+  color: var(--text-dark);
+  font-size: 28px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-management h2 svg {
+  color: var(--primary-color);
+}
+
+.team-management p {
+  color: var(--text-light);
+  margin-bottom: 24px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* 控制区域样式 */
+.member-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* 成员卡片容器 */
+.member-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+/* 成员卡片样式 */
+.member-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+  position: relative;
+}
+
+.member-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--primary-light);
+}
+
+.member-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--primary-color);
+  opacity: 0.8;
+}
+
+.member-header {
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.member-name {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.member-tech {
+  color: var(--primary-light);
+  font-size: 14px;
+  background: rgba(67, 97, 238, 0.08);
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-top: 4px;
+}
+
+.member-scores {
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.member-scores span {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-light);
+  padding: 10px;
+  border-radius: 10px;
+  border-left: 3px solid var(--primary-color);
+}
+
+.member-scores span:nth-child(2) {
+  border-left-color: var(--secondary-color);
+}
+
+.member-scores span:nth-child(3) {
+  border-left-color: var(--accent-color);
+}
+
+.member-scores span:nth-child(4) {
+  border-left-color: var(--success-color);
+}
+
+.member-scores span label {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.member-scores span span.value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.member-footer {
+  padding: 0 20px 18px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.member-delete-btn {
+  background: white;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+  padding: 6px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.member-delete-btn:hover {
+  background: var(--danger-color);
+  color: white;
+  transform: scale(1.05);
+}
+
+/* 添加成员表单样式 */
+.add-member-form {
+  background: var(--bg-light);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  margin-top: 16px;
+}
+
+.add-member-form h3 {
+  color: var(--text-dark);
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: var(--text-medium);
+  font-size: 15px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  font-size: 16px;
+  transition: var(--transition);
+  background: white;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+}
+
+/* 按钮样式 */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 6px rgba(67, 97, 238, 0.25);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(67, 97, 238, 0.35);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* 空状态样式 */
+.member-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+  font-style: italic;
+  background: var(--bg-light);
+  border-radius: 16px;
+  border: 1px dashed var(--border-color);
+}
+
+.member-empty::before {
+  content: "👥";
+  font-size: 48px;
+  display: block;
+  margin-bottom: 16px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .team-management {
+    padding: 16px;
+  }
+
+  .member-board {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+  }
+
+  .member-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .add-member-form {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .member-board {
+    grid-template-columns: 1fr;
+  }
+
+  .member-scores {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-primary, .member-delete-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .member-footer {
+    flex-direction: column;
+  }
+}
