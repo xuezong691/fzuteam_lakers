@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>用户注册/登录</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .container { width: 100%; max-width: 450px; }
+    .form-wrapper {
+      position: relative;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      min-height: 620px;
+    }
+    .form-container {
+      padding: 50px 40px;
+      position: absolute;
+      width: 100%;
+      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      opacity: 0;
+      transform: translateX(-100%);
+      pointer-events: none;
+    }
+    .form-container.active {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: all;
+    }
+    .form-container.slide-out-left {
+      opacity: 0;
+      transform: translateX(-100%);
+    }
+    .form-container.slide-out-right {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    .form-container h2 {
+      color: #333;
+      margin-bottom: 30px;
+      text-align: center;
+      font-size: 28px;
+      font-weight: 600;
+    }
+    .form-group { margin-bottom: 25px; }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s;
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 10px;
+    }
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+    .switch-text {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+    .switch-link {
+      color: #667eea;
+      font-weight: 600;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .switch-link:hover {
+      color: #764ba2;
+      text-decoration: underline;
+    }
+
+    /* 欢迎页面样式 */
+    .welcome-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 50px 40px;
+      display: none;
+    }
+    .welcome-card { text-align: center; }
+    .welcome-card h2 {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+    .user-info {
+      background: #f8f9fa;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+    .user-info p { margin-bottom: 15px; font-size: 16px; color: #555; }
+    .user-info p:last-child { margin-bottom: 0; }
+    .user-info strong { color: #333; margin-right: 10px; }
+    .user-info span { color: #667eea; font-weight: 600; }
+    .btn-logout {
+      padding: 12px 40px;
+      background: #ff6b6b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-logout:hover {
+      background: #ee5a52;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 500px) {
+      .form-container { padding: 40px 30px; }
+      .welcome-container { padding: 40px 30px; }
+    }
+
+    /* Logo 容器样式 */
+    .logo-container {
+      position: relative;
+      width: 100%;
+      text-align: center;
+      margin-top: 30px; /* 调整与表单之间的间距 */
+    }
+
+    /* Logo 图片样式 */
+    .auth-logo {
+      width: 150px; /* 调整到合适的宽度 */
+      height: auto;
+      display: inline-block;
+      transform: perspective(800px) rotateX(20deg); /* 透视效果 */
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); /* 阴影效果 */
+      transition: transform 0.3s ease-in-out; /* 添加过渡效果 */
+    }
+
+    /* 响应式设计 - 小屏幕下调整大小 */
+    @media (max-width: 768px) {
+      .auth-logo {
+        width: 120px;
+        transform: perspective(600px) rotateX(10deg);
+      }
+    }
+
+    /* 鼠标悬停时的效果 */
+    .logo-container:hover .auth-logo {
+      transform: perspective(800px) rotateX(-10deg);
+    }
+  </style>
+</head>
+<body>
+  <!-- 登录/注册表单容器 -->
+  <div class="container">
+    <div class="form-wrapper">
+      <!-- 登录表单 -->
+      <div class="form-container login-form active">
+        <h2>用户登录</h2>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="login-username">账号</label>
+            <input type="text" id="login-username" name="username" required />
+          </div>
+          <div class="form-group">
+            <label for="login-password">密码</label>
+            <input type="password" id="login-password" name="password" required />
+          </div>
+          <button type="submit" class="btn-submit">登录</button>
+        </form>
+        <div class="switch-text">
+          还没有账号？<span class="switch-link" onclick="switchToRegister()">立即注册</span>
+        </div>
+        <!-- Logo 放在表单下方 -->
+        <div class="logo-container">
+          <img src="{{ url_for('static', filename='logo.jpg') }}" alt="Logo" class="auth-logo">
+        </div>
+      </div>
+
+      <!-- 注册表单 -->
+      <div class="form-container register-form">
+        <h2>用户注册</h2>
+        <form id="registerForm">
+          <div class="form-group">
+            <label for="reg-username">账号</label>
+            <input type="text" id="reg-username" name="username" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-password">密码</label>
+            <input type="password" id="reg-password" name="password" required />
+          </div>
+          <div class="form-group">
+            <label for="reg-teamname">团队名称</label>
+            <input type="text" id="reg-teamname" name="teamname" required />
+          </div>
+          <button type="submit" class="btn-submit">注册</button>
+        </form>
+        <div class="switch-text">
+          已有账号？<span class="switch-link" onclick="switchToLogin()">立即登录</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 欢迎页面（登录后显示） -->
+  <div class="welcome-container" id="welcomeContainer">
+    <div class="welcome-card">
+      <h2>欢迎回来！</h2>
+      <div class="user-info">
+        <p><strong>用户ID：</strong><span id="displayUserId"></span></p>
+        <p><strong>团队名称：</strong><span id="displayTeamName"></span></p>
+      </div>
+      <button class="btn-logout" onclick="logout()">退出登录</button>
+    </div>
+  </div>
+
+  <script>
+    // API 基础地址（假设 Flask 运行在本地 5000 端口）
+      const API_BASE_URL = "/api";
+
+      // 切换到注册页面
+      function switchToRegister() {
+        const loginForm = document.querySelector(".login-form");
+        const registerForm = document.querySelector(".register-form");
+        loginForm.classList.remove("active");
+        loginForm.classList.add("slide-out-left");
+        setTimeout(() => {
+          loginForm.classList.remove("slide-out-left");
+          registerForm.classList.add("active");
+        }, 300);
+      }
+
+      // 切换到登录页面
+      function switchToLogin() {
+        const loginForm = document.querySelector(".login-form");
+        const registerForm = document.querySelector(".register-form");
+        registerForm.classList.remove("active");
+        registerForm.classList.add("slide-out-right");
+        setTimeout(() => {
+          registerForm.classList.remove("slide-out-right");
+          loginForm.classList.add("active");
+        }, 300);
+      }
+
+      // 登录成功后跳转到 page.html
+      document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = e.target.username.value.trim();
+        const password = e.target.password.value.trim();
+
+        if (!username || !password) {
+          alert("账号和密码不能为空");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+              localStorage.setItem("userId", result.userid);
+              localStorage.setItem("teamName", result.teamname);
+              window.location.href = "/page";
+            } else {
+              alert("登录失败：" + (result.message || "未知错误"));
+            }
+        } catch (error) {
+          console.error("登录请求出错:", error);
+          alert("网络错误，请检查后端是否运行");
+        }
+      });
+
+      // 注册成功后提示并切换到登录页（不直接跳转 page.html）
+      document.getElementById("registerForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = e.target.username.value.trim();
+        const password = e.target.password.value.trim();
+        const teamname = e.target.teamname.value.trim();
+
+        if (!username || !password || !teamname) {
+          alert("所有字段都必须填写");
+          return;
+        }
+
+        const ACCOUNT_REGEX = /^[a-zA-Z0-9]{8}$/;
+        if (!ACCOUNT_REGEX.test(username)) {
+          alert("账号必须是8位字母或数字");
+          return;
+        }
+        if (!ACCOUNT_REGEX.test(password)) {
+          alert("密码必须是8位字母或数字");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, teamname })
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            alert("注册成功！请登录。");
+            e.target.reset();
+            switchToLogin();
+          } else {
+            alert("注册失败：" + (result.message || "未知错误"));
+          }
+        } catch (error) {
+          console.error("注册请求出错:", error);
+          alert("网络错误，请检查后端是否运行");
+        }
+      });
+
+
+  </script>
+</body>
+</html>
