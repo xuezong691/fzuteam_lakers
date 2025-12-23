@@ -1,0 +1,297 @@
+app:
+  description: 'null'
+  icon: 🤖
+  icon_background: '#FFEAD5'
+  mode: advanced-chat
+  name: meeting_assistant_all
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/deepseek:0.0.6@dd589dc093c8084925858034ab5ec1fdf0d33819f43226c2f8c4a749a9acbbb2
+    version: null
+kind: app
+version: 0.4.0
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        sourceType: llm
+        targetType: answer
+      id: llm-answer
+      source: llm
+      sourceHandle: source
+      target: answer
+      targetHandle: target
+      type: custom
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: start
+        targetType: tool
+      id: 1762343450107-source-1762343523567-target
+      source: '1762343450107'
+      sourceHandle: source
+      target: '1762343523567'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: tool
+        targetType: llm
+      id: 1762343523567-source-llm-target
+      source: '1762343523567'
+      sourceHandle: source
+      target: llm
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: true
+        title: 开始
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - audio
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          default: ''
+          hint: ''
+          label: video
+          max_length: 48
+          options: []
+          placeholder: ''
+          required: true
+          type: file
+          variable: video
+      height: 87
+      id: '1762343450107'
+      position:
+        x: -87.39510068968295
+        y: -36.233154434416925
+      positionAbsolute:
+        x: -87.39510068968295
+        y: -36.233154434416925
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1762343523567'
+          - text
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: false
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: deepseek-chat
+          provider: langgenius/deepseek/deepseek
+        prompt_template:
+        - id: 9c5f7230-d937-4224-8d97-cda59d39a3cd
+          role: system
+          text: '小组讨论内容为{{#context#}}
+
+            帮我们生成一篇会议摘要'
+        selected: false
+        title: LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: llm
+      position:
+        x: 321.73681692206424
+        y: -36.233154434416925
+      positionAbsolute:
+        x: 321.73681692206424
+        y: -36.233154434416925
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#llm.text#}}'
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 102
+      id: answer
+      position:
+        x: 604.218572387443
+        y: 148.62942058096405
+      positionAbsolute:
+        x: 604.218572387443
+        y: 148.62942058096405
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        is_team_authorization: true
+        paramSchemas:
+        - auto_generate: null
+          default: null
+          form: llm
+          human_description:
+            en_US: The audio file to be converted.
+            ja_JP: The audio file to be converted.
+            pt_BR: The audio file to be converted.
+            zh_Hans: 要转换的音频文件。
+          label:
+            en_US: Audio File
+            ja_JP: Audio File
+            pt_BR: Audio File
+            zh_Hans: 音频文件
+          llm_description: The audio file to be converted.
+          max: null
+          min: null
+          name: audio_file
+          options: []
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: file
+        - auto_generate: null
+          default: null
+          form: form
+          human_description:
+            en_US: All available ASR models. You can config model in the Model Provider
+              of Settings.
+            ja_JP: All available ASR models. You can config model in the Model Provider
+              of Settings.
+            pt_BR: All available ASR models. You can config model in the Model Provider
+              of Settings.
+            zh_Hans: 所有可用的 ASR 模型。你可以在设置中的模型供应商里配置。
+          label:
+            en_US: Model
+            ja_JP: Model
+            pt_BR: Model
+            zh_Hans: Model
+          llm_description: null
+          max: null
+          min: null
+          name: model
+          options:
+          - icon: null
+            label:
+              en_US: FunAudioLLM/SenseVoiceSmall(langgenius/siliconflow/siliconflow)
+              ja_JP: FunAudioLLM/SenseVoiceSmall(langgenius/siliconflow/siliconflow)
+              pt_BR: FunAudioLLM/SenseVoiceSmall(langgenius/siliconflow/siliconflow)
+              zh_Hans: FunAudioLLM/SenseVoiceSmall(langgenius/siliconflow/siliconflow)
+            value: langgenius/siliconflow/siliconflow#FunAudioLLM/SenseVoiceSmall
+          placeholder: null
+          precision: null
+          required: true
+          scope: null
+          template: null
+          type: select
+        params:
+          audio_file: ''
+          model: ''
+        provider_id: audio
+        provider_name: audio
+        provider_type: builtin
+        selected: false
+        title: Speech To Text
+        tool_configurations:
+          model:
+            type: constant
+            value: langgenius/siliconflow/siliconflow#FunAudioLLM/SenseVoiceSmall
+        tool_description: 将音频文件转换为文本。
+        tool_label: Speech To Text
+        tool_name: asr
+        tool_node_version: '2'
+        tool_parameters:
+          audio_file:
+            type: variable
+            value:
+            - '1762343450107'
+            - video
+        type: tool
+      height: 87
+      id: '1762343523567'
+      position:
+        x: 7.019390306379421
+        y: 234.35603936283542
+      positionAbsolute:
+        x: 7.019390306379421
+        y: 234.35603936283542
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: 266.5398122168771
+      y: 196.39350651324224
+      zoom: 0.8040888484979245
+  rag_pipeline_variables: []
